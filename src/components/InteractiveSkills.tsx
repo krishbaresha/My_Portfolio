@@ -180,7 +180,11 @@ export default function InteractiveSkills() {
                 onMouseEnter={() => setHoveredIdx(idx)}
                 onMouseLeave={() => setHoveredIdx(null)}
                 whileHover={{ y: -4 }}
+<<<<<<< HEAD
                 className={`reveal-item relative rounded-2xl glass-panel p-6 space-y-6 overflow-hidden cursor-pointer transition-all duration-300 clickable ${
+=======
+                className={`reveal-item relative rounded-2xl glass-panel p-6 space-y-6 overflow-hidden cursor-pointer clickable transition-all duration-300 ${
+>>>>>>> ac51e2a (chore: clean folder structure, fix UI/UX, and add deployment guide)
                   isActive ? 'border-accent-purple bg-white/[0.03]' : 'border-white/5 hover:border-white/10'
                 }`}
               >

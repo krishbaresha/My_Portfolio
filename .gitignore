@@ -40,6 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+<<<<<<< HEAD
 # graphify
 /graphify-out/
 
@@ -47,5 +48,10 @@ next-env.d.ts
 /.agent/
 
 # dev logs
+=======
+# local agents/skills configuration
+/.agent/
+/graphify-out/
+>>>>>>> ac51e2a (chore: clean folder structure, fix UI/UX, and add deployment guide)
 *.log
 *.err

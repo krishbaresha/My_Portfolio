@@ -143,8 +143,13 @@ export default function Projects() {
                     
                     {/* Floating Stars */}
                     <div className="absolute top-4 right-4 flex items-center gap-2">
+<<<<<<< HEAD
                       <div className="px-3 py-1.5 rounded-full text-[10px] font-bold tracking-wider bg-black/60 border border-white/10 text-yellow-400 flex items-center gap-1 backdrop-blur-md clickable">
                         <Star className="w-3.5 h-3.5" /> {repos[activeIndex].stars}
+=======
+                      <div className="px-3 py-1.5 rounded-full text-[10px] font-bold tracking-wider bg-black/60 border border-white/10 text-yellow-400 flex items-center gap-1.5 backdrop-blur-md">
+                        <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" /> {repos[activeIndex].stars}
+>>>>>>> ac51e2a (chore: clean folder structure, fix UI/UX, and add deployment guide)
                       </div>
                     </div>
                   </motion.div>
