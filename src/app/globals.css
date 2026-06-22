@@ -1,0 +1,442 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
+  --color-background: #000000;
+  --color-foreground: #ffffff;
+  --color-card: #000000;
+  --color-card-border: #e5e7eb;
+  --color-accent-purple: #8b5cf6;
+  --color-accent-blue: #3b82f6;
+  --color-accent-pink: #ec4899;
+  --color-accent-glow: rgba(139, 92, 246, 0.15);
+  
+  --animate-border-beam: border-beam 4s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-slow: pulse-slow 8s ease-in-out infinite;
+
+  @keyframes border-beam {
+    0%, 100% {
+      offset-distance: 0%;
+    }
+    50% {
+      offset-distance: 100%;
+    }
+  }
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-10px) rotate(1deg);
+    }
+  }
+  @keyframes pulse-slow {
+    0%, 100% {
+      opacity: 0.2;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.4;
+      transform: scale(1.1);
+    }
+  }
+}
+
+/* ─── Stacking Context Architecture ──────────────────────────────────────────
+   Every z-index in the project must map to one of these named layers.
+   Do NOT introduce raw z-index values elsewhere.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+  
+  /* Design System Color Tokens */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e4ded7;
+  --color-text-tertiary: #95979d;
+  --color-text-inverse: #0e1016;
+  --color-surface-base: #000000;
+  --color-border-default: rgba(228, 222, 216, 0.08);
+  --color-border-strong: rgba(228, 222, 216, 0.15);
+  
+  /* Spacing Scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 40px;
+  --space-6: 64px;
+  --space-7: 80px;
+  --space-8: 96px;
+
+  /* ── Stacking Layer Tokens ────────────────────────────────────────────── */
+  --z-bg-fx:          0;      /* Layer 0: radial-spotlight, gradients */
+  --z-canvas:         1;      /* Layer 1: scroll animation canvas / 3D */
+  --z-exit-fade:      2;      /* Layer 2: exit-fade black overlay */
+  --z-vignette:       3;      /* Layer 3: vignette gradient overlays */
+  --z-section-bg:    20;      /* Layer 2b: section backgrounds */
+  --z-content:      100;      /* Layer 3: UI content (post-hero sections) */
+  --z-dropdown:      50;      /* Layer 4a: mobile dropdown */
+  --z-nav:         1000;      /* Layer 4b: floating navigation */
+  --z-loading:      999;      /* Layer 4c: loading screen */
+  --z-noise:       9999;      /* Layer 5a: noise texture */
+  --z-cursor:     10000;      /* Layer 5b: custom cursor (above all) */
+
+  /* ── Nav offset so anchor-linked sections don't hide under nav ─────── */
+  --nav-height: 72px;
+
+  /* ── Cinema easing token ──────────────────────────────────────────── */
+  --ease-cinema: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Base Styles */
+html, body {
+  background-color: #000000;
+  color: #ffffff;
+  /* scroll-behavior managed entirely by Lenis — do NOT set smooth/auto here */
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+}
+
+/* ── Anchor scroll offset — prevents nav overlap on jump links ──────────── */
+[id] {
+  scroll-margin-top: var(--nav-height);
+}
+
+/* Custom Cursor Resets */
+@media (pointer: fine) {
+  .custom-cursor-active, 
+  .custom-cursor-active a, 
+  .custom-cursor-active button, 
+  .custom-cursor-active input, 
+  .custom-cursor-active textarea,
+  .custom-cursor-active [role="button"] {
+    cursor: none !important;
+  }
+}
+
+/* Custom Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+::-webkit-scrollbar-thumb {
+  background: #1a1a1a;
+  border-radius: 9999px;
+  border: 2px solid #000000;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2a2a2a;
+}
+
+/* Glassmorphism panel helper - aligned to design system border tokens */
+.glass-panel {
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border-default);
+}
+
+.glass-panel-hover {
+  transition: all 200ms var(--ease-cinema);
+}
+.glass-panel-hover:hover {
+  background: rgba(10, 10, 10, 0.9);
+  border-color: var(--color-border-strong);
+  box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.7);
+  transform: translateY(-2px);
+}
+
+/* Tactile Noise Overlay */
+.noise-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  content: "";
+  opacity: 0.02;
+  pointer-events: none;
+  z-index: var(--z-noise);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Radial spotlight glowing backdrop */
+.radial-spotlight {
+  background: radial-gradient(
+    600px circle at var(--mouse-x, 0px) var(--mouse-y, 0px),
+    rgba(99, 102, 241, 0.06),
+    transparent 40%
+  );
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* GPU-accelerated scroll canvas pin ─────────────────────────────────────── */
+/* GSAP injects .gsap-marker-scroller-start etc. — ensure no layout bleed  */
+.pin-spacer {
+  pointer-events: none !important;
+}
+
+/* Smooth entry for sections that follow the hero scroll sequence ──────────── */
+#projects {
+  position: relative;
+  z-index: var(--z-content);
+  background-color: #000000;
+}
+
+/* ── Section Reveal Animations ───────────────────────────────────────────────
+   GPU-safe: only translate3d + opacity. No height/margin/padding changes.
+   These are the initial hidden states set by SectionReveal.tsx via GSAP.
+   ─────────────────────────────────────────────────────────────────────────── */
+.reveal-item {
+  opacity: 0;
+  transform: translate3d(0, 40px, 0);
+  will-change: transform, opacity;
+}
+
+/* ── Timeline vertical draw line ─────────────────────────────────────────── */
+.timeline-line {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  background: rgba(228, 222, 216, 0.1);
+  overflow: hidden;
+}
+
+.timeline-line::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--timeline-progress, 0%);
+  background: linear-gradient(
+    to bottom,
+    var(--color-accent-purple),
+    var(--color-accent-blue)
+  );
+  transition: height 0.4s var(--ease-cinema);
+  will-change: height;
+}
+
+/* ── Timeline node activation ────────────────────────────────────────────── */
+.timeline-node {
+  position: absolute;
+  left: -31px;
+  top: 6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: #000;
+  border: 2px solid rgba(228, 222, 216, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.3s var(--ease-cinema), box-shadow 0.3s var(--ease-cinema);
+  will-change: border-color, box-shadow;
+}
+
+.timeline-node.active {
+  border-color: var(--color-accent-purple);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
+}
+
+.timeline-node .node-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.3);
+  transition: background 0.3s var(--ease-cinema);
+}
+
+.timeline-node.active .node-dot {
+  background: #ffffff;
+}
+
+/* ── Contact form: GPU-safe focus ring (no layout shift) ─────────────────── */
+.form-field {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: #ffffff;
+  font-size: 0.875rem;
+  outline: none;
+  /* Use box-shadow instead of border/bg changes to avoid layout recalc */
+  box-shadow: 0 0 0 0px rgba(139, 92, 246, 0);
+  transition:
+    box-shadow 200ms var(--ease-cinema),
+    border-color 200ms var(--ease-cinema);
+  will-change: box-shadow;
+  transform: translateZ(0); /* own compositor layer — prevents focus reflow */
+}
+
+.form-field::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.form-field:focus {
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow:
+    0 0 0 3px rgba(139, 92, 246, 0.15),
+    inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.form-field:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Animated gradient border on contact form card ───────────────────────── */
+@keyframes gradient-border-spin {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.contact-card {
+  position: relative;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.contact-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 17px;
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.4),
+    rgba(59, 130, 246, 0.2),
+    rgba(236, 72, 153, 0.2),
+    rgba(139, 92, 246, 0.4)
+  );
+  background-size: 300% 300%;
+  animation: gradient-border-spin 8s ease infinite;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Selection Highlight */
+::selection {
+  background: rgba(139, 92, 246, 0.3);
+  color: #ffffff;
+}
+
+/* Focus-visible ring for keyboard navigation (WCAG 2.2 AA) */
+:focus-visible {
+  outline: 2px solid rgba(139, 92, 246, 0.8);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Markdown styling overrides for blog articles */
+.prose {
+  color: #a1a1aa;
+}
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  color: #f4f4f5;
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+.prose h1 { font-size: 2rem; }
+.prose h2 { font-size: 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 0.3em; }
+.prose p {
+  line-height: 1.75;
+  margin-bottom: 1.25em;
+}
+.prose code {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #ec4899;
+}
+.prose pre {
+  background: #09090b;
+  padding: 1.25em;
+  border-radius: 8px;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 1.5em;
+}
+.prose pre code {
+  background: transparent;
+  padding: 0;
+  color: #f4f4f5;
+  font-size: 0.875em;
+}
+
+/* ── Reduced Motion Guard ─────────────────────────────────────────────────────
+   Disable ALL parallax, 3D transforms, and decorative animations
+   for users who prefer reduced motion (WCAG 2.2 §2.3.3 criterion).
+   GSAP animations in JS must also check this via window.matchMedia.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Keep functional transitions (focus rings, etc.) */
+  .form-field {
+    transition: none;
+  }
+
+  /* Reveal items jump directly to final state */
+  .reveal-item {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Disable gradient border spin */
+  .contact-card::before {
+    animation: none;
+  }
+
+  /* Disable timeline line animation */
+  .timeline-line::after {
+    transition: none;
+    height: 100%;
+  }
+}
+
+/* ── Mobile: reduce animation depth ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  .reveal-item {
+    /* Shorter travel distance on mobile */
+    transform: translate3d(0, 20px, 0);
+  }
+}
