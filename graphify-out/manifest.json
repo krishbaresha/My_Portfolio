@@ -1,0 +1,137 @@
+{
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\app\\admin\\page.tsx": {
+    "mtime": 1782076452.6066027,
+    "ast_hash": "52c101cee4798a7d0d037cc759cb3c48",
+    "semantic_hash": "52c101cee4798a7d0d037cc759cb3c48"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\app\\api\\blog\\route.ts": {
+    "mtime": 1782074563.6710348,
+    "ast_hash": "cb67cda6640f659f894a2aa65e4ad6ce",
+    "semantic_hash": "cb67cda6640f659f894a2aa65e4ad6ce"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\app\\api\\chat\\route.ts": {
+    "mtime": 1782075865.9363534,
+    "ast_hash": "b03dc4b911ce20688ddc1477e53b0e4a",
+    "semantic_hash": "b03dc4b911ce20688ddc1477e53b0e4a"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\app\\api\\github\\route.ts": {
+    "mtime": 1782074433.0930512,
+    "ast_hash": "209f464b1fca52f3fd3762375108e803",
+    "semantic_hash": "209f464b1fca52f3fd3762375108e803"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\app\\blog\\[slug]\\page.tsx": {
+    "mtime": 1782074701.1851492,
+    "ast_hash": "4cdf29ee4aaf3cbb53860fd4d6b88f9e",
+    "semantic_hash": "4cdf29ee4aaf3cbb53860fd4d6b88f9e"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\app\\blog\\page.tsx": {
+    "mtime": 1782074558.6101863,
+    "ast_hash": "3a437eaee49d6329ea447efdc24db9a8",
+    "semantic_hash": "3a437eaee49d6329ea447efdc24db9a8"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\app\\layout.tsx": {
+    "mtime": 1782081763.422471,
+    "ast_hash": "344b008f00085ff47deb048033b8e3ad",
+    "semantic_hash": "344b008f00085ff47deb048033b8e3ad"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\app\\page.tsx": {
+    "mtime": 1782082812.8923328,
+    "ast_hash": "3966eb9eb80c535ecfea4f097f0a73cd",
+    "semantic_hash": "3966eb9eb80c535ecfea4f097f0a73cd"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\app\\projects\\[slug]\\page.tsx": {
+    "mtime": 1782075239.3436408,
+    "ast_hash": "9b004b2e8f272d23d7dd45af90f71465",
+    "semantic_hash": "9b004b2e8f272d23d7dd45af90f71465"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\app\\resume\\page.tsx": {
+    "mtime": 1782076678.6169293,
+    "ast_hash": "cf81e24be394aa17dc1ccbca858d3c23",
+    "semantic_hash": "cf81e24be394aa17dc1ccbca858d3c23"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\app\\robots.ts": {
+    "mtime": 1782074845.1666896,
+    "ast_hash": "e6ce3acdbdb672d28ada0b3bc40ab35a",
+    "semantic_hash": "e6ce3acdbdb672d28ada0b3bc40ab35a"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\app\\sitemap.ts": {
+    "mtime": 1782074834.6107354,
+    "ast_hash": "3ca2e89632b70f69e0bbd10271d8f518",
+    "semantic_hash": "3ca2e89632b70f69e0bbd10271d8f518"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\components\\ChatBot.tsx": {
+    "mtime": 1782074500.7101653,
+    "ast_hash": "e9882ca7aa9064de2a314ce473aa1a15",
+    "semantic_hash": "e9882ca7aa9064de2a314ce473aa1a15"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\components\\ContactForm.tsx": {
+    "mtime": 1782082729.0546532,
+    "ast_hash": "0069bd8d3b83263ae666736e8b21e98c",
+    "semantic_hash": "0069bd8d3b83263ae666736e8b21e98c"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\components\\CustomCursor.tsx": {
+    "mtime": 1782082609.009294,
+    "ast_hash": "b3f7a5446159d9712c54db3c8ea50dc9",
+    "semantic_hash": "b3f7a5446159d9712c54db3c8ea50dc9"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\components\\InteractiveSkills.tsx": {
+    "mtime": 1782082937.4741404,
+    "ast_hash": "896d3e5bee79f2041c12192d1bf6c343",
+    "semantic_hash": "896d3e5bee79f2041c12192d1bf6c343"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\components\\InteractiveTerminal.tsx": {
+    "mtime": 1782080039.4883156,
+    "ast_hash": "8183f32ffaf989bebbbea00c36f3be7a",
+    "semantic_hash": "8183f32ffaf989bebbbea00c36f3be7a"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\components\\LenisScroll.tsx": {
+    "mtime": 1782077409.9690707,
+    "ast_hash": "80725c4375360588ce22a3aefc789509",
+    "semantic_hash": "80725c4375360588ce22a3aefc789509"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\components\\Overlay.tsx": {
+    "mtime": 1782081948.0112429,
+    "ast_hash": "c716b6eececb7869f0e4338a75508fc8",
+    "semantic_hash": "c716b6eececb7869f0e4338a75508fc8"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\components\\ProjectCard.tsx": {
+    "mtime": 1782080050.4108343,
+    "ast_hash": "3a3c6617cb33b8dc549d6b3f9b9c777a",
+    "semantic_hash": "3a3c6617cb33b8dc549d6b3f9b9c777a"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\components\\Projects.tsx": {
+    "mtime": 1782082649.597363,
+    "ast_hash": "449d2ee2bf1c3a0f6a00c23a822f3602",
+    "semantic_hash": "449d2ee2bf1c3a0f6a00c23a822f3602"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\components\\ScrollSequence.tsx": {
+    "mtime": 1782074488.0010953,
+    "ast_hash": "35a559db63893c2016e4604c923c14d5",
+    "semantic_hash": "35a559db63893c2016e4604c923c14d5"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\components\\ScrollyCanvas.tsx": {
+    "mtime": 1782081967.7013218,
+    "ast_hash": "705205301513cc338329c8beb0ce37e8",
+    "semantic_hash": "705205301513cc338329c8beb0ce37e8"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\components\\SectionReveal.tsx": {
+    "mtime": 1782082631.9581058,
+    "ast_hash": "ce455999444e7448d03eb1fafe38c8c5",
+    "semantic_hash": "ce455999444e7448d03eb1fafe38c8c5"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\lib\\github.ts": {
+    "mtime": 1782076651.7131197,
+    "ast_hash": "2b8b3b09caf1f03b4011f5cec5b728ed",
+    "semantic_hash": "2b8b3b09caf1f03b4011f5cec5b728ed"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\lib\\markdown.ts": {
+    "mtime": 1782076668.3427076,
+    "ast_hash": "72ae26cae09c5770071e9164bdbd3fef",
+    "semantic_hash": "72ae26cae09c5770071e9164bdbd3fef"
+  },
+  "C:\\Users\\Kali\\Documents\\Documents\\My_Portfolio\\src\\lib\\supabase.ts": {
+    "mtime": 1782076662.0916445,
+    "ast_hash": "b9b7074ecee038f8dacebb12be36718b",
+    "semantic_hash": "b9b7074ecee038f8dacebb12be36718b"
+  }
+}
