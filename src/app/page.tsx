@@ -460,10 +460,6 @@ export default function Home() {
             <span>&copy; {new Date().getFullYear()} All Rights Reserved.</span>
           </div>
 
-          <div className="flex items-center gap-6">
-            <span>Local Time: {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })} GMT+5:30</span>
-            <Link href="/admin" className="hover:text-white transition-colors uppercase">Admin Panel</Link>
-          </div>
         </div>
       </footer>
 

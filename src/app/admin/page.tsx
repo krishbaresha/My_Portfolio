@@ -79,7 +79,7 @@ export default function AdminPage() {
 
   // Hardcoded client-side passcode check
   // In production, this should be validated against a server-side API route
-  const PASSCODE = 'krish123';
+  const PASSCODE = 'Kali@Linux';
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
