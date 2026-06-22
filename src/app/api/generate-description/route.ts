@@ -37,7 +37,7 @@ README content:
 ${readmeContent.substring(0, 3000)}
 
 Please write a 2-paragraph, premium, engaging description of this project suitable for a high-end creative portfolio case study. 
-Do not use markdown headers, just return the raw text.
+Do not use markdown headers, just return the raw text in beautiful format no mess, perfect for portfolio case and short but premium.
     `.trim();
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
