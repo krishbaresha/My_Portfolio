@@ -62,12 +62,10 @@ export default function InteractiveTerminal() {
         break;
       case 'socials':
         newHistory.push({
-<<<<<<< HEAD
-          text: 'GitHub: github.com/krishbaresha\nLinkedIn: linkedin.com/in/krishbaresha\nTwitter: x.com/krishbaresha',
-=======
+
           text: 'GitHub: github.com/krishbaresha\nLinkedIn: linkedin.com/in/krish-baresha/\nTwitter: x.com/krishbaresha',
->>>>>>> ac51e2a (chore: clean folder structure, fix UI/UX, and add deployment guide)
-          type: 'success',
+
+          type: 'success' ,
         });
         break;
       case 'clear':
