@@ -3,6 +3,7 @@ import { Syne } from "next/font/google";
 import "./globals.css";
 import CustomCursor from "@/components/CustomCursor";
 import LenisScroll from "@/components/LenisScroll";
+import { Analytics } from "@vercel/analytics/next";
 
 const syne = Syne({
   variable: "--font-syne",
@@ -79,6 +80,7 @@ export default function RootLayout({
         <CustomCursor />
         
         {children}
+        <Analytics />
       </body>
     </html>
   );
