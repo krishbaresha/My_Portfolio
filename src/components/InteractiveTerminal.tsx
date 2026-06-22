@@ -32,7 +32,7 @@ export default function InteractiveTerminal() {
     const cmd = inputValue.trim().toLowerCase();
     if (!cmd) return;
 
-    const newHistory = [...history, { text: `visitor@krish-baresha:~$ ${inputValue}`, type: 'input' as const }];
+    const newHistory = [...history, { text: `visitor@krishbaresha:~$ ${inputValue}`, type: 'input' as const }];
     setInputValue('');
 
     switch (cmd) {
@@ -62,7 +62,7 @@ export default function InteractiveTerminal() {
         break;
       case 'socials':
         newHistory.push({
-          text: 'GitHub: github.com/krish-baresha\nLinkedIn: linkedin.com/in/krishbaresha\nTwitter: x.com/krishbaresha',
+          text: 'GitHub: github.com/krishbaresha\nLinkedIn: linkedin.com/in/krishbaresha\nTwitter: x.com/krishbaresha',
           type: 'success',
         });
         break;
@@ -132,7 +132,7 @@ export default function InteractiveTerminal() {
 
       {/* Input Bar */}
       <form onSubmit={handleCommand} className="flex items-center gap-2 p-4 border-t border-white/5 bg-black/40">
-        <span className="text-accent-purple font-semibold select-none">visitor@krish-baresha:~$</span>
+        <span className="text-accent-purple font-semibold select-none">visitor@krishbaresha:~$</span>
         <input
           ref={inputRef}
           type="text"

@@ -180,7 +180,7 @@ export default function InteractiveSkills() {
                 onMouseEnter={() => setHoveredIdx(idx)}
                 onMouseLeave={() => setHoveredIdx(null)}
                 whileHover={{ y: -4 }}
-                className={`reveal-item relative rounded-2xl glass-panel p-6 space-y-6 overflow-hidden cursor-pointer transition-all duration-300 ${
+                className={`reveal-item relative rounded-2xl glass-panel p-6 space-y-6 overflow-hidden cursor-pointer transition-all duration-300 clickable ${
                   isActive ? 'border-accent-purple bg-white/[0.03]' : 'border-white/5 hover:border-white/10'
                 }`}
               >
