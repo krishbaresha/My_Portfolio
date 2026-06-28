@@ -41,11 +41,11 @@ export const metadata: Metadata = {
     title: "Krish Baresha | AI Engineer & Creative Technologist",
     description:
       "Creative developer portfolio. Agentic workflows and high-fidelity interfaces.",
-    url: "https://krishbaresha.com",
+    url: "https://krishbaresha.tech",
     siteName: "Krish Baresha Portfolio",
     images: [
       {
-        url: "https://krishbaresha.com/og-image.jpg",
+        url: "https://krishbaresha.tech/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Krish Baresha Creative Portfolio",
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    apple: "/favicon.ico",
   },
   
 };
