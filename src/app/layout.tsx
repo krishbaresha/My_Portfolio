@@ -24,7 +24,7 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "Krish Baresha | AI Engineer & Creative Technologist",
   description:
-    "Portfolio of Krish Baresha. Senior Full Stack Engineer & AI Developer building ultra-premium web experiences, autonomous AI agents, and high-performance interfaces.",
+    "Senior Full Stack Engineer & AI Developer building high-performance web experiences and autonomous AI agents.",
   metadataBase: new URL("https://krishbaresha.com"),
   keywords: [
     "AI Engineer",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     siteName: "Krish Baresha Portfolio",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "https://krishbaresha.com/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Krish Baresha Creative Portfolio",
@@ -74,10 +74,11 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/favicon.ico", // Ya '/icon.png' agar aapne file wahan rakhi hai
+    icon: "/favicon.ico",
     shortcut: "/favicon.ico",
     apple: "/favicon.ico",
   },
+  
 };
 
 export const viewport: Viewport = {
