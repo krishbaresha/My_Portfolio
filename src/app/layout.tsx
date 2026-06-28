@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     siteName: "Krish Baresha Portfolio",
     images: [
       {
-        url: "https://krishbaresha.tech/og-image.jpg",
+        url: "https://krishbaresha.tech/og-image.png",
         width: 1200,
         height: 630,
         alt: "Krish Baresha Creative Portfolio",
