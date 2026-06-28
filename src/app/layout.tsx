@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     description:
       "Creative developer portfolio. Agentic workflows and high-fidelity interfaces.",
     creator: "@krishbaresha",
-    images: ["/og-image.jpg"],
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
