@@ -1,10 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { Menu, X, Zap } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
+import AnimatedLink from './AnimatedLink';
 
 const NAV_ITEMS = [
   { name: 'Projects', href: '#projects' },
@@ -32,10 +32,11 @@ export default function NavBar() {
           className="liquid-glass flex items-center justify-between px-5 py-3 rounded-2xl"
         >
           {/* Logo */}
-          <Link
+          <AnimatedLink
             href="/"
             className="flex items-center gap-2 group"
             aria-label="Krish Baresha — home"
+            hoverScale={1.03}
           >
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
               <Zap className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
@@ -43,18 +44,20 @@ export default function NavBar() {
             <span className="text-sm font-heading font-700 tracking-tight text-foreground group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
               Krish Baresha
             </span>
-          </Link>
+          </AnimatedLink>
 
           {/* Desktop nav links */}
           <nav className="hidden md:flex items-center gap-1" role="navigation" aria-label="Main navigation">
             {NAV_ITEMS.map((item) => (
-              <Link
+              <AnimatedLink
                 key={item.name}
                 href={item.href}
-                className="px-3 py-1.5 text-xs font-medium tracking-wide text-foreground/60 hover:text-foreground rounded-lg hover:bg-foreground/5 transition-all duration-200"
+                className="px-3 py-1.5 text-xs font-medium tracking-wide text-foreground/60 hover:text-foreground rounded-lg hover:bg-foreground/5 transition-colors duration-200"
+                hoverScale={1.05}
+                tapScale={0.95}
               >
                 {item.name}
-              </Link>
+              </AnimatedLink>
             ))}
           </nav>
 
@@ -62,13 +65,15 @@ export default function NavBar() {
           <div className="flex items-center gap-2">
             <ThemeToggle />
 
-            <Link
+            <AnimatedLink
               href="#contact"
               id="nav-hire-me"
-              className="hidden md:inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-white text-xs font-semibold tracking-wide transition-all duration-200 shadow-lg shadow-amber-500/25 hover:shadow-amber-400/30 cursor-pointer"
+              className="hidden md:inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-white text-xs font-semibold tracking-wide transition-colors duration-200 shadow-lg shadow-amber-500/25 hover:shadow-amber-400/30 cursor-pointer"
+              hoverScale={1.04}
+              tapScale={0.96}
             >
               Hire Me
-            </Link>
+            </AnimatedLink>
 
             {/* Mobile hamburger */}
             <motion.button
@@ -112,23 +117,27 @@ export default function NavBar() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.05, duration: 0.2 }}
                 >
-                  <Link
+                  <AnimatedLink
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
-                    className="block px-4 py-2.5 text-sm font-medium text-foreground/70 hover:text-foreground rounded-xl hover:bg-foreground/5 transition-all"
+                    className="block px-4 py-2.5 text-sm font-medium text-foreground/70 hover:text-foreground rounded-xl hover:bg-foreground/5 transition-colors"
+                    hoverScale={1.02}
+                    tapScale={0.98}
                   >
                     {item.name}
-                  </Link>
+                  </AnimatedLink>
                 </motion.div>
               ))}
               <div className="h-px bg-foreground/8 my-1" />
-              <Link
+              <AnimatedLink
                 href="#contact"
                 onClick={() => setMobileOpen(false)}
-                className="mt-1 w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-white text-center text-sm font-semibold transition-all"
+                className="mt-1 w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-white text-center text-sm font-semibold transition-colors"
+                hoverScale={1.02}
+                tapScale={0.98}
               >
                 Hire Me
-              </Link>
+              </AnimatedLink>
             </motion.div>
           )}
         </AnimatePresence>

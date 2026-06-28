@@ -151,6 +151,28 @@ html, body {
   transition: background-color 300ms var(--ease-cinema), color 200ms var(--ease-cinema);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+body.custom-cursor-active,
+body.custom-cursor-active a,
+body.custom-cursor-active button,
+body.custom-cursor-active [role="button"],
+body.custom-cursor-active label {
+  cursor: none;
+}
+
+@media (max-width: 768px), (pointer: coarse) {
+  body.custom-cursor-active,
+  body.custom-cursor-active a,
+  body.custom-cursor-active button,
+  body.custom-cursor-active [role="button"],
+  body.custom-cursor-active label {
+    cursor: auto;
+  }
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-weight: 700;
@@ -494,6 +516,10 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ─── Reduced Motion ─────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
