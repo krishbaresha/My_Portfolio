@@ -1,37 +1,34 @@
 /**
  * BentoSkeleton — shimmer placeholder grid shown while project data loads.
- * Matches the layout structure of BentoGrid to prevent CLS.
+ * Dimensions match BentoGrid card minHeights (360px large / 240px standard).
  */
 export default function BentoSkeleton() {
   return (
-    <section className="relative z-10 py-24 px-6">
-      <div className="max-w-6xl mx-auto space-y-12">
-        {/* Header skeleton */}
-        <div className="flex flex-col gap-3">
-          <div className="skeleton h-3 w-24 rounded-full" />
-          <div className="skeleton h-10 w-64 rounded-xl" />
-          <div className="skeleton h-4 w-80 rounded-full" />
+    <section id="projects" className="relative z-10 py-24 px-6">
+      <div className="max-w-6xl mx-auto space-y-10">
+        {/* Header skeleton — matches BentoGrid header flex layout */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 min-h-[7.5rem]">
+          <div className="flex flex-col gap-3 max-w-lg min-w-0">
+            <div className="skeleton h-3 w-24 rounded-full shrink-0" />
+            <div className="skeleton h-10 w-64 max-w-full rounded-xl shrink-0" />
+            <div className="skeleton h-4 w-80 max-w-full rounded-full shrink-0" />
+          </div>
+          <div className="flex items-center gap-1.5 flex-wrap p-1 rounded-xl border border-border bg-surface/50 shrink-0">
+            {[80, 60, 72, 68, 56].map((w, i) => (
+              <div key={i} className="skeleton h-8 rounded-full shrink-0" style={{ width: `${w}px` }} />
+            ))}
+          </div>
         </div>
 
-        {/* Filter tab skeleton */}
-        <div className="flex gap-2">
-          {[80, 60, 72, 68].map((w, i) => (
-            <div key={i} className={`skeleton h-8 rounded-full`} style={{ width: `${w}px` }} />
-          ))}
-        </div>
-
-        {/* Bento grid skeleton */}
+        {/* Bento grid skeleton — fixed heights match BentoCard minHeight */}
         <div className="bento-grid">
-          {/* Large featured card */}
-          <div className="bento-lg skeleton" style={{ height: '320px' }} />
-          {/* Medium card */}
-          <div className="bento-md skeleton" style={{ height: '320px' }} />
-          {/* Three smaller cards */}
-          <div className="bento-sm skeleton" style={{ height: '220px' }} />
-          <div className="bento-sm skeleton" style={{ height: '220px' }} />
-          <div className="bento-sm skeleton" style={{ height: '220px' }} />
-          <div className="bento-md skeleton" style={{ height: '220px' }} />
-          <div className="bento-md skeleton" style={{ height: '220px' }} />
+          <div className="bento-lg skeleton min-h-[360px] h-[360px]" />
+          <div className="bento-md skeleton min-h-[360px] h-[360px]" />
+          <div className="bento-sm skeleton min-h-[240px] h-[240px]" />
+          <div className="bento-sm skeleton min-h-[240px] h-[240px]" />
+          <div className="bento-sm skeleton min-h-[240px] h-[240px]" />
+          <div className="bento-md skeleton min-h-[240px] h-[240px]" />
+          <div className="bento-md skeleton min-h-[240px] h-[240px]" />
         </div>
       </div>
     </section>

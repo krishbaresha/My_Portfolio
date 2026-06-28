@@ -176,7 +176,7 @@ export default function ResumePage() {
                 <Link2 className="w-3.5 h-3.5" /> linkedin.com/in/krishbaresha
               </a>
               <div className="flex items-center gap-2">
-                <MapPin className="w-3.5 h-3.5" /> Hyderabad, Sindh, Pakistan  (Open to Remote)
+                <MapPin className="w-3.5 h-3.5" /> Hyderabad, Sindh, Pakistan
               </div>
             </div>
           </header>

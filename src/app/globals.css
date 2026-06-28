@@ -1,6 +1,4 @@
-/* ─── Google Fonts ──────────────────────────────────────────────────────────── */
-@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
-
+/* Fonts are loaded via next/font in layout.tsx (display: swap) — no @import here. */
 @import "tailwindcss";
 
 /* ─── Tailwind Theme Tokens ─────────────────────────────────────────────────── */
@@ -312,8 +310,9 @@ h1, h2, h3, h4, h5, h6 {
 .bento-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  grid-auto-rows: minmax(120px, auto);
+  grid-auto-rows: minmax(240px, auto);
   gap: 16px;
+  contain: layout style;
 }
 
 /* Card size variants */
@@ -352,15 +351,46 @@ h1, h2, h3, h4, h5, h6 {
 */
 .text-chroma {
   position: relative;
+  display: block;
+  contain: layout style;
+  /* Reserve line box from visible text; pseudo layers overlay without affecting flow */
 }
 
 .text-chroma::before,
 .text-chroma::after {
   content: attr(data-text);
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   pointer-events: none;
   mix-blend-mode: screen;
+  white-space: nowrap;
+}
+
+/* ─── Hero layout containment ────────────────────────────────────────────────── */
+.hero-shell {
+  contain: layout style;
+  min-height: calc(100dvh - var(--nav-height));
+  min-height: calc(100svh - var(--nav-height));
+}
+
+.hero-heading-line {
+  display: block;
+  line-height: 1;
+  min-height: 1em;
+  contain: layout style;
+}
+
+.hero-content-stack {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  contain: layout style;
+}
+
+.hero-content-stack > * {
+  grid-area: 1 / 1;
 }
 
 .text-chroma::before {

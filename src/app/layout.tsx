@@ -8,6 +8,8 @@ const archivo = Archivo({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   display: "swap",
+  adjustFontFallback: true,
+  preload: true,
 });
 
 const spaceGrotesk = Space_Grotesk({
@@ -15,6 +17,8 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   display: "swap",
+  adjustFontFallback: true,
+  preload: true,
 });
 
 export const metadata: Metadata = {

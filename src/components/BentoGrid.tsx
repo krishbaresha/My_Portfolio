@@ -63,8 +63,8 @@ function BentoCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.98 }}
       transition={{ duration: 0.45, delay: index * 0.04, ease: [0.16, 1, 0.3, 1] }}
-      className={`${size} group relative overflow-hidden rounded-2xl border border-border bg-surface/60 backdrop-blur-sm hover:border-foreground/20 hover:bg-surface transition-colors duration-300`}
-      style={{ minHeight: isLarge ? '360px' : '240px' }}
+      className={`${size} group relative overflow-hidden rounded-2xl border border-border bg-surface/60 backdrop-blur-sm hover:border-foreground/20 hover:bg-surface transition-colors duration-300 contain-[layout_style]`}
+      style={{ minHeight: isLarge ? '360px' : '240px', height: isLarge ? '360px' : '240px' }}
     >
       {project.thumbnail ? (
         <div className="absolute inset-0">
@@ -88,9 +88,9 @@ function BentoCard({
         />
       )}
 
-      <div className="relative z-10 h-full flex flex-col p-5 gap-3">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex flex-wrap items-center gap-2">
+      <div className="relative z-10 h-full min-h-0 flex flex-col p-5 gap-3 overflow-hidden">
+        <div className="flex items-start justify-between gap-2 shrink-0">
+          <div className="flex flex-wrap items-center gap-2 min-w-0">
             {project.featured && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-foreground text-background text-[10px] font-semibold uppercase tracking-wider">
                 <Star className="w-2.5 h-2.5 fill-current" />
@@ -211,9 +211,9 @@ export default function BentoGrid({ projects }: { projects: Project[] }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col md:flex-row md:items-end justify-between gap-6"
+          className="flex flex-col md:flex-row md:items-end justify-between gap-6 min-h-[7.5rem]"
         >
-          <div className="space-y-3 max-w-lg">
+          <div className="space-y-3 max-w-lg min-w-0">
             <p className="text-xs font-medium tracking-widest text-foreground/40 uppercase">
               Work
             </p>
