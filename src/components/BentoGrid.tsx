@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ExternalLink, ArrowUpRight, Star, Layers, Target, TrendingUp } from 'lucide-react';
 import { GithubIcon } from './Icons';
+import ProjectsEmptyState from './ProjectsEmptyState';
 import { IMAGE_SIZES, PRIORITY_IMAGE_COUNT } from '@/lib/assets';
 import type { Project } from '@/lib/supabase';
 
@@ -198,6 +199,7 @@ function BentoCard({
 
 export default function BentoGrid({ projects }: { projects: Project[] }) {
   const [activeFilter, setActiveFilter] = useState<string>('All');
+  const isEmpty = projects.length === 0;
 
   const filtered = useMemo(
     () => projects.filter((p) => matchesFilter(p, activeFilter)),
@@ -221,39 +223,45 @@ export default function BentoGrid({ projects }: { projects: Project[] }) {
               Engineering outcomes, not screenshots.
             </h2>
             <p className="text-sm text-foreground/50 leading-relaxed">
-              Each card documents the problem solved, the system design, and measurable business impact.
+              {isEmpty
+                ? 'Fresh case studies are on the way — documenting problem, architecture, and measurable impact.'
+                : 'Each card documents the problem solved, the system design, and measurable business impact.'}
             </p>
           </div>
 
-          <div className="flex items-center gap-1.5 flex-wrap p-1 rounded-xl border border-border bg-surface/50" role="tablist">
-            {FILTERS.map((f) => (
-              <button
-                key={f}
-                role="tab"
-                aria-selected={activeFilter === f}
-                onClick={() => setActiveFilter(f)}
-                className={`relative px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
-                  activeFilter === f
-                    ? 'text-background'
-                    : 'text-foreground/50 hover:text-foreground'
-                }`}
-              >
-                {activeFilter === f && (
-                  <motion.span
-                    layoutId="bento-filter"
-                    className="absolute inset-0 rounded-lg bg-foreground"
-                    transition={{ type: 'spring', bounce: 0.15, duration: 0.35 }}
-                  />
-                )}
-                <span className="relative z-10">{f}</span>
-              </button>
-            ))}
-          </div>
+          {!isEmpty && (
+            <div className="flex items-center gap-1.5 flex-wrap p-1 rounded-xl border border-border bg-surface/50 shrink-0" role="tablist">
+              {FILTERS.map((f) => (
+                <button
+                  key={f}
+                  role="tab"
+                  aria-selected={activeFilter === f}
+                  onClick={() => setActiveFilter(f)}
+                  className={`relative px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                    activeFilter === f
+                      ? 'text-background'
+                      : 'text-foreground/50 hover:text-foreground'
+                  }`}
+                >
+                  {activeFilter === f && (
+                    <motion.span
+                      layoutId="bento-filter"
+                      className="absolute inset-0 rounded-lg bg-foreground"
+                      transition={{ type: 'spring', bounce: 0.15, duration: 0.35 }}
+                    />
+                  )}
+                  <span className="relative z-10">{f}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </motion.div>
 
         <LayoutGroup>
           <AnimatePresence mode="popLayout">
-            {filtered.length > 0 ? (
+            {isEmpty ? (
+              <ProjectsEmptyState key="empty" variant="empty" />
+            ) : filtered.length > 0 ? (
               <motion.div layout className="bento-grid">
                 {filtered.map((project, idx) => (
                   <BentoCard
@@ -266,13 +274,7 @@ export default function BentoGrid({ projects }: { projects: Project[] }) {
                 ))}
               </motion.div>
             ) : (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex items-center justify-center h-40 rounded-2xl border border-dashed border-border"
-              >
-                <p className="text-foreground/40 text-sm">No projects in &ldquo;{activeFilter}&rdquo;</p>
-              </motion.div>
+              <ProjectsEmptyState key={`filtered-${activeFilter}`} variant="filtered" filterLabel={activeFilter} />
             )}
           </AnimatePresence>
         </LayoutGroup>
