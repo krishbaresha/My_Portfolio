@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   title: "Krish Baresha | AI Engineer & Creative Technologist",
   description:
     "Senior Full Stack Engineer & AI Developer building high-performance web experiences and autonomous AI agents.",
-  metadataBase: new URL("https://krishbaresha.com"),
+  metadataBase: new URL("https://krishbaresha.tech"),
   keywords: [
     "AI Engineer",
     "Creative Developer",
