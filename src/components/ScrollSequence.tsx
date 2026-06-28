@@ -173,7 +173,7 @@ export default function ScrollSequence() {
 
   return (
     <>
-      {!isReady && available !== false && (
+      {!isReady && (
         <div className="fixed inset-0 bg-background z-[999] flex flex-col items-center justify-center font-body">
           <div className="relative flex flex-col items-center">
             <div className="absolute w-72 h-72 bg-accent-purple/10 rounded-full blur-3xl" />
