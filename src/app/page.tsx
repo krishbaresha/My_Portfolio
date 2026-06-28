@@ -1,9 +1,10 @@
 /**
  * Home Page — React Server Component
  *
- * Data is fetched server-side via getProjects().
- * No useEffect, no useState at the page level.
- * Client-interactivity is delegated to client components.
+ * Architecture:
+ *   RSC shell (static sections) + Suspense boundaries for dynamic islands.
+ *   Projects and testimonials stream independently with skeleton fallbacks.
+ *   No heavy scroll animations — Framer Motion entrance only in client children.
  */
 
 import { Suspense } from 'react';
@@ -16,12 +17,9 @@ import TestimonialsSkeleton from '@/components/TestimonialsSkeleton';
 import InteractiveSkills from '@/components/InteractiveSkills';
 import ContactForm from '@/components/ContactForm';
 import SectionReveal, { RevealItem } from '@/components/SectionReveal';
-import ScrollSequenceWrapper from '@/components/ScrollSequenceWrapper';
 import { getProjects } from '@/lib/projects';
-import { Award, Sparkles, GitBranch, Code2, Brain } from 'lucide-react';  
+import { Award, Sparkles, GitBranch, Code2, Brain } from 'lucide-react';
 
-
-// ─── Timeline data ────────────────────────────────────────────────────────────
 const TIMELINE_ITEMS = [
   {
     year: '2025 — Present',
@@ -56,125 +54,81 @@ const TIMELINE_ITEMS = [
   },
 ];
 
-// ─── Stats ────────────────────────────────────────────────────────────────────
 const STATS = [
   { value: '12+', label: 'Projects' },
-  { value: '83', label: 'GitHub Stars' },
-  { value: '290+', label: 'Commits' },
+  { value: '94%', label: 'Avg. success rate' },
+  { value: '<1s', label: 'Target LCP' },
 ];
 
-// ─── Testimonials section (async, streamed) ──────────────────────────────────
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
-export default async function Home() {
+async function ProjectsSection() {
   const projects = await getProjects();
+  return <BentoGrid projects={projects} />;
+}
 
+export default function Home() {
   return (
     <main className="relative min-h-screen bg-background overflow-x-hidden">
-
-      {/* Animated mesh background */}
       <div className="mesh-background" aria-hidden="true">
         <div className="mesh-blob mesh-blob-a" />
         <div className="mesh-blob mesh-blob-b" />
         <div className="mesh-blob mesh-blob-c" />
       </div>
 
-      {/* Floating NavBar */}
       <NavBar />
-
-      {/* ── Hero ── */}
       <HeroSection />
 
-      {/* ── Scroll sequence (hidden if frames missing) ── */}
-      <ScrollSequenceWrapper />
-
-      {/* ── Projects Bento Grid ── */}
       <Suspense fallback={<BentoSkeleton />}>
-        <BentoGrid projects={projects} />
+        <ProjectsSection />
       </Suspense>
 
-      {/* ── About Section ── */}
-      <section
-        id="about"
-        className="relative z-10 py-24 px-6 border-t border-foreground/8"
-      >
+      <section id="about" className="relative z-10 py-24 px-6 border-t border-border">
         <div className="max-w-5xl mx-auto">
           <SectionReveal stagger={0.08}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-
-              {/* Left — story */}
               <div className="space-y-6">
                 <RevealItem>
-                  <span className="text-xs font-semibold tracking-[0.2em] text-amber-500 uppercase">
-                    The Story
-                  </span>
+                  <p className="text-xs font-medium tracking-widest text-foreground/40 uppercase">About</p>
                 </RevealItem>
                 <RevealItem>
-                  <h2 className="text-4xl md:text-5xl font-heading font-700 text-foreground leading-tight tracking-tight">
-                    Developer who thinks in pixels and system runtimes.
+                  <h2 className="text-3xl md:text-4xl font-heading font-700 text-foreground leading-tight tracking-tight">
+                    Systems engineer with a product design sensibility.
                   </h2>
                 </RevealItem>
                 <RevealItem>
                   <p className="text-foreground/60 font-light leading-relaxed">
-                    My engineering journey is driven by an obsession with interactive digital craftsmanship. I design UI pipelines that feel physically responsive, while coordinating low-latency backend architectures.
+                    I build SaaS-grade interfaces backed by measurable performance budgets. Every project ships with
+                    clear architecture decisions and business metrics — not vanity demos.
                   </p>
                 </RevealItem>
                 <RevealItem>
-                  <p className="text-foreground/60 font-light leading-relaxed">
-                    As AI shifts from raw LLM prompts to self-healing agentic actions, I bridge the gap by deploying vector indices, pgvector retrieval routes, and robust automation runners.
-                  </p>
-                </RevealItem>
-
-                {/* Stats */}
-                <RevealItem>
-                  <div className="grid grid-cols-3 gap-4 pt-2">
+                  <div className="grid grid-cols-3 gap-3 pt-2">
                     {STATS.map((s) => (
-                      <div
-                        key={s.label}
-                        className="liquid-glass p-4 text-center rounded-2xl"
-                      >
-                        <div className="text-2xl font-heading font-700 text-foreground">
-                          {s.value}
-                        </div>
-                        <div className="text-[10px] text-foreground/40 uppercase tracking-wider mt-1">
-                          {s.label}
-                        </div>
+                      <div key={s.label} className="rounded-xl border border-border bg-surface/50 p-4 text-center">
+                        <div className="text-xl font-heading font-700 text-foreground tabular-nums">{s.value}</div>
+                        <div className="text-[10px] text-foreground/40 uppercase tracking-wider mt-1">{s.label}</div>
                       </div>
                     ))}
                   </div>
                 </RevealItem>
               </div>
 
-              {/* Right — timeline */}
               <div className="space-y-6" id="experience">
                 <RevealItem>
-                  <div className="flex items-center gap-2">
-                    <Award className="w-4 h-4 text-amber-500" />
-                    <span className="text-xs font-semibold tracking-[0.2em] text-amber-500 uppercase">
-                      Career Roadmap
-                    </span>
-                  </div>
+                  <p className="text-xs font-medium tracking-widest text-foreground/40 uppercase">Experience</p>
                 </RevealItem>
-
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {TIMELINE_ITEMS.map((item, idx) => {
                     const Icon = item.icon;
                     return (
                       <RevealItem key={idx}>
-                        <div className="liquid-glass liquid-glass-hover p-5 rounded-2xl flex gap-4 items-start">
-                          <div className="shrink-0 w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 mt-0.5">
+                        <div className="rounded-xl border border-border bg-surface/50 p-5 flex gap-4 items-start hover:border-foreground/20 transition-colors">
+                          <div className="shrink-0 w-9 h-9 rounded-lg border border-border flex items-center justify-center text-foreground/60">
                             <Icon className="w-4 h-4" />
                           </div>
                           <div className="min-w-0">
-                            <span className="text-[10px] font-mono tracking-wider text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">
-                              {item.year}
-                            </span>
-                            <h4 className="text-sm font-heading font-600 text-foreground mt-2 leading-tight">
-                              {item.title}
-                            </h4>
-                            <span className="text-xs text-foreground/40 font-medium">
-                              {item.company}
-                            </span>
+                            <span className="text-[10px] font-mono text-foreground/40">{item.year}</span>
+                            <h4 className="text-sm font-heading font-600 text-foreground mt-1">{item.title}</h4>
+                            <span className="text-xs text-foreground/40">{item.company}</span>
                             <p className="text-xs text-foreground/50 font-light leading-relaxed mt-1.5">
                               {item.description}
                             </p>
@@ -190,46 +144,29 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ── Skills Section ── */}
-      <section
-        id="skills"
-        className="relative z-10 py-24 px-6 border-t border-foreground/8"
-      >
+      <section id="skills" className="relative z-10 py-24 px-6 border-t border-border">
         <div className="max-w-6xl mx-auto space-y-16">
           <SectionReveal>
-            <div className="text-center space-y-4 max-w-xl mx-auto">
+            <div className="text-center space-y-3 max-w-xl mx-auto">
               <RevealItem>
-                <span className="text-xs font-semibold tracking-[0.2em] text-amber-500 uppercase">
-                  Capabilities
-                </span>
+                <p className="text-xs font-medium tracking-widest text-foreground/40 uppercase">Stack</p>
               </RevealItem>
               <RevealItem>
-                <h2 className="text-4xl md:text-5xl font-heading font-700 text-foreground tracking-tight">
-                  Technical Skills
+                <h2 className="text-3xl md:text-4xl font-heading font-700 text-foreground tracking-tight">
+                  Technical capabilities
                 </h2>
-              </RevealItem>
-              <RevealItem>
-                <p className="text-foreground/50 text-sm font-light leading-relaxed">
-                  Structured capabilities spanning high-performance creative UI systems, neural agents, and database runtimes.
-                </p>
               </RevealItem>
             </div>
           </SectionReveal>
-
           <InteractiveSkills />
         </div>
       </section>
 
-      {/* ── Testimonials ── */}
       <Suspense fallback={<TestimonialsSkeleton />}>
         <TestimonialsSection />
       </Suspense>
 
-      {/* ── Contact Section ── */}
-      <section
-        id="contact"
-        className="relative z-10 py-24 px-6 border-t border-foreground/8"
-      >
+      <section id="contact" className="relative z-10 py-24 px-6 border-t border-border">
         <div className="max-w-6xl mx-auto">
           <SectionReveal>
             <RevealItem>
@@ -239,13 +176,12 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ── Footer ── */}
-      <footer className="relative z-10 border-t border-foreground/8 py-10 px-6">
+      <footer className="relative z-10 border-t border-border py-10 px-6">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-foreground/40 text-xs">
           <div className="flex items-center gap-2">
             <GitBranch className="w-3.5 h-3.5" />
             <span className="font-heading font-600 text-foreground/60">Krish Baresha</span>
-            <span>© {new Date().getFullYear()} — All Rights Reserved.</span>
+            <span>© {new Date().getFullYear()}</span>
           </div>
           <div className="flex items-center gap-4">
             <a href="https://github.com/krishbaresha" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">

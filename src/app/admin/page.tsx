@@ -52,6 +52,10 @@ const EMPTY_PROJECT: ProjectUpsert = {
   title: '',
   slug: '',
   description: '',
+  technical_challenge: '',
+  architecture: '',
+  impact_metrics: [],
+  category: 'Full Stack',
   thumbnail: '',
   tech_stack: [],
   github_url: '',
@@ -81,12 +85,30 @@ function ProjectForm({
 }) {
   const [form, setForm] = useState<ProjectUpsert>(initial);
   const [techInput, setTechInput] = useState(initial.tech_stack.join(', '));
+  const [metricsInput, setMetricsInput] = useState(
+    initial.impact_metrics?.map((m) => `${m.value} | ${m.label}`).join('\n') ?? ''
+  );
   const [saving, setSaving] = useState(false);
+
+  const parseMetrics = (raw: string) =>
+    raw
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const [value, label] = line.split('|').map((s) => s.trim());
+        return { value: value ?? '', label: label ?? '' };
+      })
+      .filter((m) => m.value && m.label);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    await onSave({ ...form, tech_stack: techInput.split(',').map((s) => s.trim()).filter(Boolean) });
+    await onSave({
+      ...form,
+      tech_stack: techInput.split(',').map((s) => s.trim()).filter(Boolean),
+      impact_metrics: parseMetrics(metricsInput),
+    });
     setSaving(false);
   };
 
@@ -136,15 +158,64 @@ function ProjectForm({
           value={form.description ?? ''}
           onChange={(e) => setForm({ ...form, description: e.target.value })}
           className="form-field resize-none"
-          placeholder="Short project description..."
+          placeholder="One-line summary for case study header…"
         />
       </div>
 
+      <div className="space-y-1.5">
+        <label className="text-[10px] font-semibold uppercase tracking-wider text-foreground/50">Technical challenge</label>
+        <textarea
+          rows={2}
+          value={form.technical_challenge ?? ''}
+          onChange={(e) => setForm({ ...form, technical_challenge: e.target.value })}
+          className="form-field resize-none"
+          placeholder="What engineering problem did you solve?"
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-[10px] font-semibold uppercase tracking-wider text-foreground/50">Architecture</label>
+        <textarea
+          rows={2}
+          value={form.architecture ?? ''}
+          onChange={(e) => setForm({ ...form, architecture: e.target.value })}
+          className="form-field resize-none font-mono text-xs"
+          placeholder="Next.js · Supabase · Edge functions · …"
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-[10px] font-semibold uppercase tracking-wider text-foreground/50">
+          Impact metrics (one per line: value | label)
+        </label>
+        <textarea
+          rows={3}
+          value={metricsInput}
+          onChange={(e) => setMetricsInput(e.target.value)}
+          className="form-field resize-none font-mono text-xs"
+          placeholder={'94% | Task success\n1.2s | Avg. latency'}
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-[10px] font-semibold uppercase tracking-wider text-foreground/50">Category</label>
+        <select
+          value={form.category}
+          onChange={(e) => setForm({ ...form, category: e.target.value })}
+          className="form-field"
+        >
+          {['AI', 'WebGL', 'Full Stack', 'SaaS'].map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+      </div>
+
       <ImageUpload
-        label="Thumbnail"
+        label="Thumbnail (Supabase Storage only)"
         folder="projects"
         value={form.thumbnail ?? ''}
         onChange={(url) => setForm({ ...form, thumbnail: url })}
+        allowUrlFallback={false}
       />
 
       <div className="space-y-1.5">

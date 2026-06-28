@@ -4,124 +4,176 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ExternalLink, ArrowRight, Star } from 'lucide-react';
+import { ExternalLink, ArrowUpRight, Star, Layers, Target, TrendingUp } from 'lucide-react';
 import { GithubIcon } from './Icons';
+import { IMAGE_SIZES, PRIORITY_IMAGE_COUNT } from '@/lib/assets';
 import type { Project } from '@/lib/supabase';
 
-// ─── Bento size map — gives each card position a responsive span class ────────
 const BENTO_SIZES = [
-  'bento-lg',   // 0 — big featured card
-  'bento-md',   // 1 — medium
-  'bento-sm',   // 2
-  'bento-sm',   // 3
-  'bento-sm',   // 4
-  'bento-md',   // 5
-  'bento-md',   // 6
-  'bento-sm',   // 7
-  'bento-sm',   // 8
-  'bento-sm',   // 9
+  'bento-lg',
+  'bento-md',
+  'bento-sm',
+  'bento-sm',
+  'bento-sm',
+  'bento-md',
+  'bento-md',
+  'bento-sm',
+  'bento-sm',
+  'bento-sm',
 ];
+
+const FILTERS = ['All', 'AI', 'WebGL', 'Full Stack', 'SaaS'] as const;
 
 function getBentoSize(idx: number) {
   return BENTO_SIZES[idx % BENTO_SIZES.length];
 }
 
-// ─── Filter categories ────────────────────────────────────────────────────────
-const FILTERS = ['All', 'AI', 'WebGL', 'Full Stack', 'SaaS'];
-
 function matchesFilter(project: Project, filter: string) {
   if (filter === 'All') return true;
-  const haystack = [...project.tech_stack, project.title, project.description ?? '']
-    .join(' ')
-    .toLowerCase();
-  return haystack.includes(filter.toLowerCase());
+  return project.category?.toLowerCase() === filter.toLowerCase();
 }
 
-// ─── Individual Bento Card ────────────────────────────────────────────────────
+function MetricPill({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-border bg-surface/80 px-2.5 py-1.5 min-w-0">
+      <div className="text-[10px] uppercase tracking-wider text-foreground/40 truncate">{label}</div>
+      <div className="text-sm font-semibold text-foreground tabular-nums truncate">{value}</div>
+    </div>
+  );
+}
+
 function BentoCard({
   project,
   size,
   priority,
+  index,
 }: {
   project: Project;
   size: string;
   priority: boolean;
+  index: number;
 }) {
   const isLarge = size === 'bento-lg' || size === 'bento-xl';
+  const metrics = project.impact_metrics?.slice(0, isLarge ? 3 : 2) ?? [];
 
   return (
     <motion.article
       layout
-      initial={{ opacity: 0, scale: 0.96 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.94 }}
-      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className={`${size} liquid-glass iridescent-glow group relative overflow-hidden cursor-pointer`}
-      style={{ minHeight: isLarge ? '320px' : '220px' }}
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.98 }}
+      transition={{ duration: 0.45, delay: index * 0.04, ease: [0.16, 1, 0.3, 1] }}
+      className={`${size} group relative overflow-hidden rounded-2xl border border-border bg-surface/60 backdrop-blur-sm hover:border-foreground/20 hover:bg-surface transition-colors duration-300`}
+      style={{ minHeight: isLarge ? '360px' : '240px' }}
     >
-      {/* Thumbnail */}
-      {project.thumbnail && (
+      {project.thumbnail ? (
         <div className="absolute inset-0">
           <Image
             src={project.thumbnail}
-            alt={`${project.title} project thumbnail`}
+            alt=""
             fill
-            sizes={isLarge ? '(max-width: 768px) 100vw, 66vw' : '(max-width: 768px) 100vw, 33vw'}
-            className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+            sizes={isLarge ? IMAGE_SIZES.bentoFeatured : IMAGE_SIZES.bentoStandard}
+            className="object-cover opacity-40 group-hover:opacity-50 transition-opacity duration-500"
             priority={priority}
           />
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/20" />
         </div>
+      ) : (
+        <div
+          className="absolute inset-0 opacity-30"
+          style={{
+            background:
+              'radial-gradient(circle at 20% 20%, var(--mesh-color-a), transparent 50%), radial-gradient(circle at 80% 80%, var(--mesh-color-b), transparent 50%)',
+          }}
+        />
       )}
 
-      {/* Liquid glass tint on hover */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-amber-500/5 via-purple-500/5 to-blue-500/5" />
+      <div className="relative z-10 h-full flex flex-col p-5 gap-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {project.featured && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-foreground text-background text-[10px] font-semibold uppercase tracking-wider">
+                <Star className="w-2.5 h-2.5 fill-current" />
+                Featured
+              </span>
+            )}
+            <span className="px-2 py-0.5 rounded-md border border-border text-[10px] font-medium text-foreground/50 uppercase tracking-wider">
+              {project.category}
+            </span>
+          </div>
+          <Link
+            href={`/projects/${project.slug}`}
+            className="shrink-0 w-8 h-8 rounded-lg border border-border flex items-center justify-center text-foreground/40 hover:text-foreground hover:border-foreground/30 transition-colors"
+            aria-label={`Open ${project.title} case study`}
+          >
+            <ArrowUpRight className="w-4 h-4" />
+          </Link>
+        </div>
 
-      {/* Content */}
-      <div className="relative z-10 h-full flex flex-col justify-end p-5 gap-3">
-        {/* Featured badge */}
-        {project.featured && (
-          <div className="self-start inline-flex items-center gap-1 px-2 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[10px] font-semibold tracking-wider uppercase">
-            <Star className="w-2.5 h-2.5 fill-amber-400" />
-            Featured
+        <div className="flex-1 space-y-3 min-h-0">
+          <h3 className={`font-heading font-700 text-foreground leading-tight tracking-tight ${isLarge ? 'text-2xl' : 'text-lg'}`}>
+            {project.title}
+          </h3>
+
+          {project.technical_challenge && (
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-foreground/40">
+                <Target className="w-3 h-3" />
+                Challenge
+              </div>
+              <p className={`text-foreground/70 leading-relaxed ${isLarge ? 'text-sm line-clamp-3' : 'text-xs line-clamp-2'}`}>
+                {project.technical_challenge}
+              </p>
+            </div>
+          )}
+
+          {isLarge && project.architecture && (
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-foreground/40">
+                <Layers className="w-3 h-3" />
+                Architecture
+              </div>
+              <p className="text-xs text-foreground/60 font-mono leading-relaxed line-clamp-2">
+                {project.architecture}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {metrics.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-foreground/40">
+              <TrendingUp className="w-3 h-3" />
+              Impact
+            </div>
+            <div className={`grid gap-2 ${isLarge ? 'grid-cols-3' : 'grid-cols-2'}`}>
+              {metrics.map((m) => (
+                <MetricPill key={`${m.label}-${m.value}`} label={m.label} value={m.value} />
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Title */}
-        <h3 className={`font-heading font-700 text-white leading-tight ${isLarge ? 'text-2xl' : 'text-lg'}`}>
-          {project.title}
-        </h3>
-
-        {/* Description — only on larger cards */}
-        {isLarge && project.description && (
-          <p className="text-white/70 text-sm font-light leading-relaxed line-clamp-2">
-            {project.description}
-          </p>
-        )}
-
-        {/* Tech stack tags */}
-        <div className="flex flex-wrap gap-1.5">
-          {project.tech_stack.slice(0, isLarge ? 5 : 3).map((tech) => (
+        <div className="flex flex-wrap gap-1.5 pt-1">
+          {project.tech_stack.slice(0, isLarge ? 4 : 3).map((tech) => (
             <span
               key={tech}
-              className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-white/10 border border-white/10 text-white/70 backdrop-blur-sm"
+              className="px-2 py-0.5 rounded-md text-[10px] font-medium border border-border text-foreground/50"
             >
               {tech}
             </span>
           ))}
         </div>
 
-        {/* Links row */}
-        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           {project.github_url && (
             <a
               href={project.github_url}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`${project.title} GitHub repository`}
+              aria-label="GitHub"
               onClick={(e) => e.stopPropagation()}
-              className="w-8 h-8 rounded-lg liquid-glass flex items-center justify-center text-white/70 hover:text-white transition-colors"
+              className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-foreground/50 hover:text-foreground transition-colors"
             >
               <GithubIcon className="w-3.5 h-3.5" />
             </a>
@@ -131,29 +183,21 @@ function BentoCard({
               href={project.live_url}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`${project.title} live demo`}
+              aria-label="Live demo"
               onClick={(e) => e.stopPropagation()}
-              className="w-8 h-8 rounded-lg liquid-glass flex items-center justify-center text-white/70 hover:text-white transition-colors"
+              className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-foreground/50 hover:text-foreground transition-colors"
             >
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           )}
-          <Link
-            href={`/projects/${project.slug}`}
-            onClick={(e) => e.stopPropagation()}
-            className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-500/90 hover:bg-amber-400 text-white text-xs font-semibold transition-colors"
-          >
-            Case Study <ArrowRight className="w-3 h-3" />
-          </Link>
         </div>
       </div>
     </motion.article>
   );
 }
 
-// ─── BentoGrid ────────────────────────────────────────────────────────────────
 export default function BentoGrid({ projects }: { projects: Project[] }) {
-  const [activeFilter, setActiveFilter] = useState('All');
+  const [activeFilter, setActiveFilter] = useState<string>('All');
 
   const filtered = useMemo(
     () => projects.filter((p) => matchesFilter(p, activeFilter)),
@@ -162,54 +206,51 @@ export default function BentoGrid({ projects }: { projects: Project[] }) {
 
   return (
     <section id="projects" className="relative z-10 py-24 px-6">
-      <div className="max-w-6xl mx-auto space-y-12">
-
-        {/* Section header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-2">
-            <span className="text-xs font-semibold tracking-[0.2em] text-amber-500 uppercase">
-              Selected Work
-            </span>
-            <h2 className="text-4xl md:text-5xl font-heading font-700 text-foreground tracking-tight">
-              Projects
+      <div className="max-w-6xl mx-auto space-y-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col md:flex-row md:items-end justify-between gap-6"
+        >
+          <div className="space-y-3 max-w-lg">
+            <p className="text-xs font-medium tracking-widest text-foreground/40 uppercase">
+              Work
+            </p>
+            <h2 className="text-3xl md:text-4xl font-heading font-700 text-foreground tracking-tight">
+              Engineering outcomes, not screenshots.
             </h2>
-            <p className="text-foreground/50 text-sm font-light max-w-sm leading-relaxed">
-              A curated showcase of systems, interfaces, and AI-powered experiences.
+            <p className="text-sm text-foreground/50 leading-relaxed">
+              Each card documents the problem solved, the system design, and measurable business impact.
             </p>
           </div>
 
-          {/* Filter tabs */}
-          <div
-            className="flex items-center gap-2 flex-wrap"
-            role="tablist"
-            aria-label="Project filter"
-          >
+          <div className="flex items-center gap-1.5 flex-wrap p-1 rounded-xl border border-border bg-surface/50" role="tablist">
             {FILTERS.map((f) => (
               <button
                 key={f}
                 role="tab"
                 aria-selected={activeFilter === f}
                 onClick={() => setActiveFilter(f)}
-                className={`relative px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
+                className={`relative px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                   activeFilter === f
-                    ? 'text-white'
-                    : 'text-foreground/50 hover:text-foreground liquid-glass'
+                    ? 'text-background'
+                    : 'text-foreground/50 hover:text-foreground'
                 }`}
               >
                 {activeFilter === f && (
                   <motion.span
-                    layoutId="active-filter"
-                    className="absolute inset-0 rounded-full bg-amber-500"
-                    transition={{ type: 'spring', bounce: 0.25, duration: 0.4 }}
+                    layoutId="bento-filter"
+                    className="absolute inset-0 rounded-lg bg-foreground"
+                    transition={{ type: 'spring', bounce: 0.15, duration: 0.35 }}
                   />
                 )}
                 <span className="relative z-10">{f}</span>
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Bento Grid */}
         <LayoutGroup>
           <AnimatePresence mode="popLayout">
             {filtered.length > 0 ? (
@@ -219,7 +260,8 @@ export default function BentoGrid({ projects }: { projects: Project[] }) {
                     key={project.id}
                     project={project}
                     size={getBentoSize(idx)}
-                    priority={idx < 2}
+                    priority={idx < PRIORITY_IMAGE_COUNT}
+                    index={idx}
                   />
                 ))}
               </motion.div>
@@ -227,9 +269,9 @@ export default function BentoGrid({ projects }: { projects: Project[] }) {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="flex items-center justify-center h-40 liquid-glass rounded-2xl"
+                className="flex items-center justify-center h-40 rounded-2xl border border-dashed border-border"
               >
-                <p className="text-foreground/40 text-sm">No projects found for &ldquo;{activeFilter}&rdquo;</p>
+                <p className="text-foreground/40 text-sm">No projects in &ldquo;{activeFilter}&rdquo;</p>
               </motion.div>
             )}
           </AnimatePresence>

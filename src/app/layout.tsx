@@ -91,6 +91,13 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${archivo.variable} ${spaceGrotesk.variable}`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('portfolio-theme');var d=document.documentElement;if(t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches))d.classList.add('dark');else d.classList.remove('dark')}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className="font-body bg-background text-foreground antialiased selection:bg-accent-gold/20 selection:text-foreground">
         {/* Tactile Noise Texture */}
         <div className="noise-overlay" aria-hidden="true" />
