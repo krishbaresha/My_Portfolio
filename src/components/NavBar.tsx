@@ -11,7 +11,6 @@ const NAV_ITEMS = [
   { name: 'About', href: '#about' },
   { name: 'Skills', href: '#skills' },
   { name: 'Experience', href: '#experience' },
-  { name: 'Blog', href: '/blog' },
 ];
 
 export default function NavBar() {

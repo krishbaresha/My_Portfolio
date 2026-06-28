@@ -29,9 +29,7 @@ export default function ChatBot() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const handleSendMessage = async (text: string) => {
@@ -68,19 +66,18 @@ export default function ChatBot() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-[100] font-sans">
-      {/* Trigger Button */}
+    <div className="fixed bottom-6 right-6 z-[100] font-body">
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
         className="w-14 h-14 rounded-full bg-gradient-to-tr from-accent-purple to-accent-blue flex items-center justify-center text-white shadow-lg cursor-pointer hover:shadow-purple-500/20 hover:scale-105 active:scale-95 transition-all relative group"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
+        aria-label={isOpen ? 'Close chat' : 'Open chat'}
       >
         <span className="absolute inset-0 rounded-full bg-gradient-to-tr from-accent-purple to-accent-blue animate-ping opacity-25 group-hover:opacity-40 transition-opacity" />
         <MessageSquare className="w-6 h-6" />
       </motion.button>
 
-      {/* Chat Window Panel */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -90,25 +87,24 @@ export default function ChatBot() {
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="absolute bottom-20 right-0 w-[90vw] sm:w-[400px] h-[550px] rounded-2xl glass-panel shadow-2xl flex flex-col overflow-hidden"
           >
-            {/* Header */}
-            <div className="p-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
+            <div className="p-4 border-b border-foreground/10 bg-foreground/5 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-accent-purple animate-pulse" />
                 <div>
-                  <h4 className="text-sm font-bold text-white leading-tight">Krish AI Assistant</h4>
-                  <span className="text-[10px] text-zinc-500">Trained on Portfolio</span>
+                  <h4 className="text-sm font-bold text-foreground leading-tight">Krish AI Assistant</h4>
+                  <span className="text-[10px] text-foreground/50">Trained on Portfolio</span>
                 </div>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                className="text-foreground/50 hover:text-foreground transition-colors cursor-pointer"
+                aria-label="Close chat"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Message Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar bg-background/50">
               {messages.map((m, idx) => (
                 <div
                   key={idx}
@@ -118,18 +114,17 @@ export default function ChatBot() {
                     className={`max-w-[80%] rounded-xl px-4 py-2.5 text-sm leading-relaxed ${
                       m.role === 'user'
                         ? 'bg-gradient-to-r from-accent-purple to-accent-blue text-white rounded-br-none shadow-md'
-                        : 'bg-white/5 border border-white/5 text-zinc-300 rounded-bl-none'
+                        : 'bg-foreground/5 border border-foreground/10 text-foreground/80 rounded-bl-none'
                     }`}
                   >
                     {m.content}
                   </div>
                 </div>
               ))}
-              
-              {/* Typing loader */}
+
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-white/5 border border-white/5 text-zinc-300 rounded-xl rounded-bl-none px-4 py-3 flex items-center gap-1.5">
+                  <div className="bg-foreground/5 border border-foreground/10 text-foreground/70 rounded-xl rounded-bl-none px-4 py-3 flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-bounce" style={{ animationDelay: '0ms' }} />
                     <span className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-bounce" style={{ animationDelay: '150ms' }} />
                     <span className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-bounce" style={{ animationDelay: '300ms' }} />
@@ -139,14 +134,13 @@ export default function ChatBot() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Presets suggestions */}
             {messages.length === 1 && (
-              <div className="px-4 py-2 flex flex-wrap gap-2 border-t border-white/5 bg-black/20">
+              <div className="px-4 py-2 flex flex-wrap gap-2 border-t border-foreground/10 bg-foreground/[0.03]">
                 {PRESETS.map((preset) => (
                   <button
                     key={preset}
                     onClick={() => handleSendMessage(preset)}
-                    className="text-[11px] text-zinc-400 bg-white/5 border border-white/5 hover:bg-white/10 hover:text-white transition-all px-2.5 py-1 rounded-full cursor-pointer"
+                    className="text-[11px] text-foreground/60 bg-foreground/5 border border-foreground/10 hover:bg-foreground/10 hover:text-foreground transition-all px-2.5 py-1 rounded-full cursor-pointer"
                   >
                     {preset}
                   </button>
@@ -154,13 +148,12 @@ export default function ChatBot() {
               </div>
             )}
 
-            {/* Input area */}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 handleSendMessage(input);
               }}
-              className="p-4 border-t border-white/5 bg-black/40 flex items-center gap-2"
+              className="p-4 border-t border-foreground/10 bg-background/80 flex items-center gap-2"
             >
               <input
                 type="text"
@@ -168,12 +161,12 @@ export default function ChatBot() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 disabled={isLoading}
-                className="flex-1 bg-white/5 border border-white/5 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-accent-purple focus:bg-white/10 transition-all placeholder:text-zinc-600 disabled:opacity-50"
+                className="flex-1 form-field py-2 text-sm disabled:opacity-50"
               />
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className="p-2.5 rounded-xl bg-white/5 border border-white/5 text-white hover:bg-gradient-to-r hover:from-accent-purple hover:to-accent-blue hover:border-transparent transition-all disabled:opacity-30 disabled:hover:bg-white/5 disabled:hover:border-white/5 disabled:hover:text-zinc-500 cursor-pointer"
+                className="p-2.5 rounded-xl bg-foreground/5 border border-foreground/10 text-foreground hover:bg-gradient-to-r hover:from-accent-purple hover:to-accent-blue hover:text-white hover:border-transparent transition-all disabled:opacity-30 cursor-pointer"
               >
                 <Send className="w-4 h-4" />
               </button>

@@ -4,21 +4,8 @@
  * It directly calls Supabase without exposing secrets to the client.
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createServerSupabase } from '@/lib/supabase/server';
 import type { Project } from './supabase';
-
-// Server-only Supabase client (can use service role key if needed)
-function getServerClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !key) return null;
-  return createClient(url, key, {
-    auth: { persistSession: false },
-  });
-}
 
 const FALLBACK_PROJECTS: Project[] = [
   {
@@ -125,7 +112,7 @@ const FALLBACK_PROJECTS: Project[] = [
  * Results are cached for 60 seconds by Next.js fetch cache.
  */
 export async function getProjects(): Promise<Project[]> {
-  const client = getServerClient();
+  const client = createServerSupabase();
 
   if (!client) {
     console.warn('[projects] Supabase not configured — using fallback data');

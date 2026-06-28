@@ -17,6 +17,13 @@
   --color-accent-blue: #3b82f6;
   --color-accent-pink: #ec4899;
 
+  /* Semantic tokens → Tailwind utilities (bg-background, text-foreground, …) */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+
   /* Keyframes */
   @keyframes mesh-drift {
     0%   { transform: translate(0%, 0%) scale(1); }
@@ -78,7 +85,7 @@
   --surface-hover:     rgba(255, 255, 255, 0.92);
   --border:            rgba(0, 0, 0, 0.08);
   --border-strong:     rgba(0, 0, 0, 0.14);
-  --muted:             #78716C;
+  --muted:             #57534E;
   --muted-bg:          rgba(0, 0, 0, 0.04);
 
   --glass-bg:          rgba(255, 255, 255, 0.72);
@@ -118,7 +125,7 @@
   --surface-hover:     rgba(255, 255, 255, 0.08);
   --border:            rgba(255, 255, 255, 0.08);
   --border-strong:     rgba(255, 255, 255, 0.15);
-  --muted:             #78716C;
+  --muted:             #A8A29E;
   --muted-bg:          rgba(255, 255, 255, 0.04);
 
   --glass-bg:          rgba(12, 10, 9, 0.60);
@@ -404,7 +411,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .form-field:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ─── Prose (Blog) ───────────────────────────────────────────────────────────── */
+/* ─── Prose (project docs, rich text) ────────────────────────────────────────── */
 .prose { color: var(--muted); }
 .prose h1, .prose h2, .prose h3, .prose h4 {
   color: var(--foreground);
@@ -436,6 +443,24 @@ h1, h2, h3, h4, h5, h6 {
 /* ─── Utility Helpers ────────────────────────────────────────────────────────── */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Theme-aware panel primitives (used by contact, chat, project pages) */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  box-shadow: var(--glass-shadow);
+}
+
+.contact-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--glass-shadow);
+}
 
 /* ─── Reduced Motion ─────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {

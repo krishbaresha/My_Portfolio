@@ -33,7 +33,6 @@ export default function ContactForm() {
         colors: ['#8b5cf6', '#3b82f6', '#ec4899']
       });
 
-      // Reset form after a delay
       setTimeout(() => {
         setForm({ name: '', email: '', company: '', budget: '', message: '' });
         setStatus('idle');
@@ -45,75 +44,58 @@ export default function ContactForm() {
     }
   };
 
+  const channelClass =
+    'flex items-center gap-4 p-4 rounded-xl bg-foreground/5 border border-foreground/10 hover:bg-foreground/10 hover:border-foreground/15 transition-all group cursor-pointer';
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 max-w-6xl mx-auto items-start">
-      {/* Left Info Column */}
       <div className="lg:col-span-5 space-y-8">
         <div>
           <span className="text-xs font-bold tracking-[0.2em] text-accent-purple uppercase">
             Get in touch
           </span>
-          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mt-2 leading-tight">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground mt-2 leading-tight">
             LET&apos;S BUILD SOMETHING EXTRAORDINARY.
           </h2>
-          <p className="text-zinc-400 font-light mt-4 leading-relaxed">
+          <p className="text-foreground/60 font-light mt-4 leading-relaxed">
             Have a project, job opening, or vision you want to bring to life? Drop a message, or reach out directly on WhatsApp or LinkedIn. Let&apos;s engineer something beautiful.
           </p>
         </div>
 
-        {/* Channels */}
         <div className="space-y-4">
-          <a
-            href="https://wa.me/923142291356"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all group cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center text-green-400 group-hover:scale-110 transition-transform">
+          <a href="https://wa.me/923142291356" target="_blank" rel="noopener noreferrer" className={channelClass}>
+            <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center text-green-500 group-hover:scale-110 transition-transform">
               <MessageSquare className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-xs text-zinc-500 font-semibold tracking-wider uppercase">WhatsApp Chat</div>
-              <div className="text-sm font-medium text-white">+92 314 2291356</div>
+              <div className="text-xs text-foreground/50 font-semibold tracking-wider uppercase">WhatsApp Chat</div>
+              <div className="text-sm font-medium text-foreground">+92 314 2291356</div>
             </div>
           </a>
 
-          <a
-            href="https://www.linkedin.com/in/krish-baresha/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all group cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+          <a href="https://www.linkedin.com/in/krish-baresha/" target="_blank" rel="noopener noreferrer" className={channelClass}>
+            <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform">
               <Link2 className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-xs text-zinc-500 font-semibold tracking-wider uppercase">LinkedIn Connect</div>
-              <div className="text-sm font-medium text-white">in/krishbaresha</div>
+              <div className="text-xs text-foreground/50 font-semibold tracking-wider uppercase">LinkedIn Connect</div>
+              <div className="text-sm font-medium text-foreground">in/krishbaresha</div>
             </div>
           </a>
 
-          <a
-            href="mailto:krishbareshaworking@gmail.com"
-            className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all group cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
+          <a href="mailto:krishbareshaworking@gmail.com" className={channelClass}>
+            <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform">
               <Mail className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-xs text-zinc-500 font-semibold tracking-wider uppercase">Direct Email</div>
-              <div className="text-sm font-medium text-white">krishbareshaworking@gmail.com</div>
+              <div className="text-xs text-foreground/50 font-semibold tracking-wider uppercase">Direct Email</div>
+              <div className="text-sm font-medium text-foreground">krishbareshaworking@gmail.com</div>
             </div>
           </a>
         </div>
       </div>
 
-      {/* Right Form Column */}
       <div className="lg:col-span-7">
-        {/*
-          contact-card class: animated gradient border (CSS-only, no JS).
-          Defined in globals.css — no layout shift, GPU-composited.
-        */}
         <div className="contact-card p-8 relative overflow-hidden">
           {status === 'success' ? (
             <motion.div
@@ -121,25 +103,19 @@ export default function ContactForm() {
               animate={{ opacity: 1, scale: 1 }}
               className="flex flex-col items-center justify-center py-16 text-center space-y-4 relative z-10"
             >
-              <CheckCircle2 className="w-16 h-16 text-green-400 animate-bounce" />
-              <h3 className="text-2xl font-bold text-white">Message Transmitted!</h3>
-              <p className="text-sm text-zinc-400 max-w-sm leading-relaxed">
+              <CheckCircle2 className="w-16 h-16 text-green-500 animate-bounce" />
+              <h3 className="text-2xl font-bold text-foreground">Message Transmitted!</h3>
+              <p className="text-sm text-foreground/60 max-w-sm leading-relaxed">
                 Thank you for reaching out. Your details have been stored, and I will get back to you shortly.
               </p>
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {/* Name */}
                 <div className="space-y-2">
-                  <label htmlFor="contact-name" className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                  <label htmlFor="contact-name" className="text-xs font-semibold uppercase tracking-wider text-foreground/50">
                     Your Name
                   </label>
-                  {/*
-                    form-field class: uses box-shadow for focus ring, NOT border/bg changes.
-                    This prevents layout recalc on focus — zero layout shift.
-                    transform:translateZ(0) promotes to own compositor layer.
-                  */}
                   <input
                     type="text"
                     id="contact-name"
@@ -152,9 +128,8 @@ export default function ContactForm() {
                   />
                 </div>
 
-                {/* Email */}
                 <div className="space-y-2">
-                  <label htmlFor="contact-email" className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                  <label htmlFor="contact-email" className="text-xs font-semibold uppercase tracking-wider text-foreground/50">
                     Your Email
                   </label>
                   <input
@@ -171,9 +146,8 @@ export default function ContactForm() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {/* Company */}
                 <div className="space-y-2">
-                  <label htmlFor="contact-company" className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                  <label htmlFor="contact-company" className="text-xs font-semibold uppercase tracking-wider text-foreground/50">
                     Company / Organization
                   </label>
                   <input
@@ -187,9 +161,8 @@ export default function ContactForm() {
                   />
                 </div>
 
-                {/* Budget Range */}
                 <div className="space-y-2">
-                  <label htmlFor="contact-budget" className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                  <label htmlFor="contact-budget" className="text-xs font-semibold uppercase tracking-wider text-foreground/50">
                     Project Budget (Any Currency)
                   </label>
                   <input
@@ -204,9 +177,8 @@ export default function ContactForm() {
                 </div>
               </div>
 
-              {/* Message */}
               <div className="space-y-2">
-                <label htmlFor="contact-message" className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                <label htmlFor="contact-message" className="text-xs font-semibold uppercase tracking-wider text-foreground/50">
                   Project Brief
                 </label>
                 <textarea
@@ -221,7 +193,10 @@ export default function ContactForm() {
                 />
               </div>
 
-              {/* Submit Button */}
+              {status === 'error' && (
+                <p className="text-xs text-red-500 text-center">Something went wrong. Please try again.</p>
+              )}
+
               <button
                 type="submit"
                 disabled={status === 'submitting'}

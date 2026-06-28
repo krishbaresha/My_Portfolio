@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Unlock,
@@ -21,6 +21,10 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { db } from '@/lib/supabase';
+import { verifyAdminPasscode, checkAdminSession } from '@/lib/actions/auth';
+import { upsertProjectAction, deleteProjectAction } from '@/lib/actions/projects';
+import { addTestimonialAction, deleteTestimonialAction } from '@/lib/actions/testimonials';
+import { ImageUpload } from '@/components/admin/ImageUpload';
 import { GithubIcon } from '@/components/Icons';
 import type { Project, ProjectUpsert, Testimonial } from '@/lib/supabase';
 
@@ -136,15 +140,12 @@ function ProjectForm({
         />
       </div>
 
-      <div className="space-y-1.5">
-        <label className="text-[10px] font-semibold uppercase tracking-wider text-foreground/50">Thumbnail URL</label>
-        <input
-          value={form.thumbnail ?? ''}
-          onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
-          className="form-field"
-          placeholder="https://images.unsplash.com/..."
-        />
-      </div>
+      <ImageUpload
+        label="Thumbnail"
+        folder="projects"
+        value={form.thumbnail ?? ''}
+        onChange={(url) => setForm({ ...form, thumbnail: url })}
+      />
 
       <div className="space-y-1.5">
         <label className="text-[10px] font-semibold uppercase tracking-wider text-foreground/50">Tech Stack (comma-separated)</label>
@@ -246,17 +247,29 @@ export default function AdminPage() {
   });
   const [addingTestimonial, setAddingTestimonial] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [deletingTestimonialId, setDeletingTestimonialId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
-  const PASSCODE = 'Kali@Linux';
+  useEffect(() => {
+    checkAdminSession().then((valid) => {
+      if (valid) {
+        setAuthenticated(true);
+        loadData();
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passcode === PASSCODE) {
+    setAuthError('');
+    const result = await verifyAdminPasscode(passcode);
+    if (result.success) {
       setAuthenticated(true);
-      setAuthError('');
+      setPasscode('');
       loadData();
     } else {
-      setAuthError('Invalid passcode. Access denied.');
+      setAuthError(result.error ?? 'Invalid passcode. Access denied.');
       setPasscode('');
     }
   };
@@ -280,33 +293,62 @@ export default function AdminPage() {
   };
 
   const handleSaveProject = async (project: ProjectUpsert) => {
-    const { error } = await db.upsertProject(project);
-    if (error) { console.error('Error saving project:', error); return; }
+    setActionError(null);
+    const { error } = await upsertProjectAction(project);
+    if (error) {
+      setActionError(error);
+      console.error('Error saving project:', error);
+      return;
+    }
     setShowProjectForm(false);
     setEditingProject(null);
     await loadData();
   };
 
   const handleDeleteProject = async (id: string) => {
+    setActionError(null);
     setDeletingProjectId(id);
-    await db.deleteProject(id);
+    const { error } = await deleteProjectAction(id);
     setDeletingProjectId(null);
+    if (error) {
+      setActionError(error);
+      console.error('Error deleting project:', error);
+      return;
+    }
     await loadData();
   };
 
   const handleAddTestimonial = async (e: React.FormEvent) => {
     e.preventDefault();
+    setActionError(null);
     setAddingTestimonial(true);
     try {
-      await db.addTestimonial(newTestimonial);
+      const { error } = await addTestimonialAction(newTestimonial);
+      if (error) {
+        setActionError(error);
+        return;
+      }
       setNewTestimonial({ name: '', role: '', company: '', text: '', avatar_url: '', rating: 5 });
       setShowAddForm(false);
       await loadData();
     } catch (err) {
       console.error(err);
+      setActionError(err instanceof Error ? err.message : 'Failed to add testimonial');
     } finally {
       setAddingTestimonial(false);
     }
+  };
+
+  const handleDeleteTestimonial = async (id: string) => {
+    setActionError(null);
+    setDeletingTestimonialId(id);
+    const { error } = await deleteTestimonialAction(id);
+    setDeletingTestimonialId(null);
+    if (error) {
+      setActionError(error);
+      return;
+    }
+    await loadData();
   };
 
   // ── Login screen ─────────────────────────────────────────────────────────────
@@ -426,6 +468,10 @@ export default function AdminPage() {
             </Link>
           </div>
         </div>
+
+        {actionError && (
+          <p className="text-xs text-red-500 liquid-glass rounded-xl px-4 py-3">{actionError}</p>
+        )}
 
         {/* Tabs */}
         <div className="flex items-center gap-2 flex-wrap">
@@ -585,19 +631,24 @@ export default function AdminPage() {
                   className="liquid-glass rounded-2xl p-6 space-y-4"
                 >
                   <div className="grid grid-cols-2 gap-4">
-                    {(['name', 'role', 'company', 'avatar_url'] as const).map((field) => (
+                    {(['name', 'role', 'company'] as const).map((field) => (
                       <div key={field} className="space-y-1.5">
-                        <label className="text-[10px] font-semibold uppercase tracking-wider text-foreground/50">{field.replace('_', ' ')}</label>
+                        <label className="text-[10px] font-semibold uppercase tracking-wider text-foreground/50">{field}</label>
                         <input
                           value={newTestimonial[field]}
                           onChange={(e) => setNewTestimonial({ ...newTestimonial, [field]: e.target.value })}
                           className="form-field"
-                          required={field !== 'avatar_url'}
-                          placeholder={field === 'avatar_url' ? 'https://...' : ''}
+                          required
                         />
                       </div>
                     ))}
                   </div>
+                  <ImageUpload
+                    label="Avatar"
+                    folder="testimonials"
+                    value={newTestimonial.avatar_url}
+                    onChange={(url) => setNewTestimonial({ ...newTestimonial, avatar_url: url })}
+                  />
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-semibold uppercase tracking-wider text-foreground/50">Testimonial Text</label>
                     <textarea
@@ -654,6 +705,17 @@ export default function AdminPage() {
                         ))}
                       </div>
                     </div>
+                    <button
+                      onClick={() => handleDeleteTestimonial(t.id)}
+                      disabled={deletingTestimonialId === t.id}
+                      className="w-8 h-8 rounded-lg liquid-glass flex items-center justify-center text-foreground/40 hover:text-red-400 transition-colors cursor-pointer disabled:opacity-50 shrink-0"
+                      aria-label={`Delete testimonial from ${t.name}`}
+                    >
+                      {deletingTestimonialId === t.id
+                        ? <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        : <Trash2 className="w-3.5 h-3.5" />
+                      }
+                    </button>
                   </div>
                 ))}
               </div>
