@@ -1,117 +1,75 @@
 'use client';
 
-import { useEffect, useRef, ReactNode } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 
 interface SectionRevealProps {
-  children: ReactNode;
-  /**
-   * CSS selector (scoped to this component's root) to stagger.
-   * Defaults to '.reveal-item'
-   */
-  selector?: string;
-  /**
-   * Delay between each staggered item (seconds).
-   * Defaults to 0.08
-   */
+  children: React.ReactNode;
+  /** Delay before starting the reveal (seconds) */
+  delay?: number;
+  /** Amount of element that must be in view before triggering (0–1) */
+  amount?: number;
+  /** Stagger delay between child .reveal-item elements (seconds) */
   stagger?: number;
-  /**
-   * Y travel distance in px. Defaults to 40.
-   * Reduced to 20 on mobile via CSS; JS reads computed transform.
-   */
-  yOffset?: number;
-  /**
-   * GSAP easing. Defaults to 'power3.out'
-   */
-  ease?: string;
-  /**
-   * ScrollTrigger start. Defaults to 'top 85%'
-   */
-  start?: string;
-  className?: string;
+}
+
+const containerVariants = (stagger: number) => ({
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: stagger,
+      delayChildren: 0,
+    },
+  },
+});
+
+const childVariants = {
+  hidden: { opacity: 0, y: 28, filter: 'blur(4px)' },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] as const },
+  },
+};
+
+export default function SectionReveal({
+  children,
+  delay = 0,
+  amount = 0.2,
+  stagger = 0.1,
+}: SectionRevealProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, amount });
+
+  return (
+    <motion.div
+      ref={ref}
+      variants={containerVariants(stagger)}
+      initial="hidden"
+      animate={inView ? 'visible' : 'hidden'}
+      transition={{ delayChildren: delay }}
+    >
+      {/* Wrap each .reveal-item child in a motion.div automatically */}
+      {children}
+    </motion.div>
+  );
 }
 
 /**
- * SectionReveal
- * ─────────────────────────────────────────────────────────────────
- * Wraps children with a GSAP ScrollTrigger viewport-gated reveal.
- *
- * RULES (enforced):
- * - Fires ONCE when section enters viewport (once: true equivalent)
- * - Uses ONLY translate3d + opacity (GPU-safe — no layout recalc)
- * - Checks `prefers-reduced-motion` and skips animation if set
- * - Does NOT create a scrub — no conflict with hero scrolly-canvas
- * ─────────────────────────────────────────────────────────────────
+ * Use this as a direct motion wrapper for individual items inside SectionReveal.
+ * <RevealItem>...</RevealItem>
  */
-export default function SectionReveal({
+export function RevealItem({
   children,
-  selector = '.reveal-item',
-  stagger = 0.08,
-  yOffset = 40,
-  ease = 'power3.out',
-  start = 'top 85%',
   className,
-}: SectionRevealProps) {
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-
-    // Respect reduced-motion preference — jump to final state immediately
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) {
-      const items = root.querySelectorAll(selector);
-      items.forEach((el) => {
-        (el as HTMLElement).style.opacity = '1';
-        (el as HTMLElement).style.transform = 'none';
-      });
-      return;
-    }
-
-    // Reduce travel distance on mobile
-    const isMobile = window.innerWidth < 768;
-    const travelY = isMobile ? Math.round(yOffset / 2) : yOffset;
-
-    const items = root.querySelectorAll(selector);
-    if (items.length === 0) return;
-
-    // Set initial hidden state (these elements have .reveal-item CSS class
-    // with opacity:0 + translate3d already set, but we set imperatively
-    // here too so GSAP's from() tween starts correctly)
-    gsap.set(items, {
-      opacity: 0,
-      y: travelY,
-      force3D: true,
-    });
-
-    const ctx = gsap.context(() => {
-      gsap.to(items, {
-        opacity: 1,
-        y: 0,
-        duration: 0.9,
-        ease,
-        stagger,
-        force3D: true,
-        clearProps: 'transform', // release GPU layer after animation
-        scrollTrigger: {
-          trigger: root,
-          start,
-          once: true, // ← never re-fires; no conflict with hero trigger
-          toggleActions: 'play none none none',
-        },
-      });
-    }, root);
-
-    return () => ctx.revert();
-  }, [selector, stagger, yOffset, ease, start]);
-
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div ref={rootRef} className={className}>
+    <motion.div variants={childVariants} className={className}>
       {children}
-    </div>
+    </motion.div>
   );
 }

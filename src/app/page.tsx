@@ -1,383 +1,278 @@
-'use client';
+/**
+ * Home Page — React Server Component
+ *
+ * Data is fetched server-side via getProjects().
+ * No useEffect, no useState at the page level.
+ * Client-interactivity is delegated to client components.
+ */
 
-import { useEffect, useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { 
-  Award,
-  Sparkles,
-  Menu,
-  X
-} from 'lucide-react';
-import Link from 'next/link';
-
-// Import custom components
-import ScrollyCanvas from '@/components/ScrollyCanvas';
-import Overlay from '@/components/Overlay';
-import Projects from '@/components/Projects';
-import ContactForm from '@/components/ContactForm';
-import ChatBot from '@/components/ChatBot';
-import InteractiveTerminal from '@/components/InteractiveTerminal';
+import { Suspense } from 'react';
+import NavBar from '@/components/NavBar';
+import HeroSection from '@/components/HeroSection';
+import BentoGrid from '@/components/BentoGrid';
+import BentoSkeleton from '@/components/BentoSkeleton';
 import InteractiveSkills from '@/components/InteractiveSkills';
-import SectionReveal from '@/components/SectionReveal';
-import { RepoData } from '@/lib/github';
+import ContactForm from '@/components/ContactForm';
+import SectionReveal, { RevealItem } from '@/components/SectionReveal';
+import { getProjects } from '@/lib/projects';
 import { db } from '@/lib/supabase';
+import { Award, Sparkles, GitBranch, Code2, Brain } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
-
-// Navigation Items
-const NAV_ITEMS = [
-  { name: 'Projects', href: '#projects' },
-  { name: 'About', href: '#about' },
-  { name: 'Skills', href: '#skills' },
-  { name: 'Experience', href: '#experience' },
-  { name: 'Blog', href: '/blog' },
-  { name: 'Resume', href: '/resume' },
-];
-
-interface Testimonial {
-  id: string;
-  name: string;
-  role: string;
-  company: string;
-  text: string;
-  avatar_url?: string;
-  rating: number;
-}
-
-// ── Timeline data ──────────────────────────────────────────────────────────────
+// ─── Timeline data ────────────────────────────────────────────────────────────
 const TIMELINE_ITEMS = [
   {
-    year: '2025 - Present',
+    year: '2025 — Present',
     title: 'AI Engineer & Tech Lead',
     company: 'Creative Tech Lab',
-    description: 'Architecting browser automation agents, local LLM RAG pipelines, and high-performance immersive WebGL user interfaces.',
-    type: 'work'
+    description:
+      'Architecting browser automation agents, local LLM RAG pipelines, and high-performance immersive interfaces.',
+    icon: Brain,
   },
   {
-    year: '2024 - 2025',
+    year: '2024 — 2025',
     title: 'Full Stack Engineer & AI Specialist',
     company: 'SaaS Automation Hub',
-    description: 'Integrated OpenAI/Gemini models, optimized vector database latency, and developed core Next.js web portals.',
-    type: 'work'
+    description:
+      'Integrated OpenAI/Gemini models, optimized vector database latency, and developed core Next.js web portals.',
+    icon: Code2,
   },
   {
-    year: '2023 - 2024',
+    year: '2023 — 2024',
     title: 'Creative Frontend Developer',
     company: 'Self-employed',
-    description: 'Crafted award-nominated user interfaces using WebGL, GLSL shaders, GSAP timelines, and Framer Motion.',
-    type: 'work'
+    description:
+      'Crafted award-nominated user interfaces using WebGL, GLSL shaders, GSAP timelines, and Framer Motion.',
+    icon: Sparkles,
   },
   {
-    year: '2026 - 2030',
+    year: '2026 — 2030',
     title: 'B.S. in Computer Science',
     company: 'University Of Sindh, Jamshoro',
-    description: 'Will Specialize in AI & ML, and Web Development.',
-    type: 'education'
-  }
+    description: 'Specializing in AI & ML, and Full Stack Web Development.',
+    icon: Award,
+  },
 ];
 
-// ── TimelineSection ────────────────────────────────────────────────────────────
-// Scroll-linked vertical progress line via GSAP ScrollTrigger (viewport-gated,
-// not scrubbed — no conflict with hero scrolly-canvas trigger).
-function TimelineSection() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const lineRef = useRef<HTMLDivElement>(null);
-  const nodeRefs = useRef<(HTMLDivElement | null)[]>([]);
+// ─── Stats ────────────────────────────────────────────────────────────────────
+const STATS = [
+  { value: '12+', label: 'Projects' },
+  { value: '83', label: 'GitHub Stars' },
+  { value: '290+', label: 'Commits' },
+];
 
-  useEffect(() => {
-    const container = containerRef.current;
-    const line = lineRef.current;
-    if (!container || !line) return;
-
-    // Respect reduced-motion preference
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) {
-      line.style.setProperty('--timeline-progress', '100%');
-      nodeRefs.current.forEach((node) => node?.classList.add('active'));
-      return;
-    }
-
-    const ctx = gsap.context(() => {
-      // Animate the CSS custom property --timeline-progress from 0% → 100%
-      // as the timeline section scrolls through the viewport.
-      // Uses a plain object tween + onUpdate to set the CSS var.
-      const progress = { value: 0 };
-      gsap.to(progress, {
-        value: 100,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: container,
-          start: 'top 70%',
-          end: 'bottom 30%',
-          scrub: 1.5,
-          once: false, // allow re-scrub as user scrolls up/down
-          onUpdate(self) {
-            // Set the CSS variable driving the ::after height
-            line.style.setProperty('--timeline-progress', `${self.progress * 100}%`);
-
-            // Activate nodes sequentially as scroll progresses
-            const nodeCount = nodeRefs.current.length;
-            nodeRefs.current.forEach((node, idx) => {
-              if (!node) return;
-              const threshold = (idx / nodeCount);
-              if (self.progress >= threshold) {
-                node.classList.add('active');
-              } else {
-                node.classList.remove('active');
-              }
-            });
-          },
-        },
-      });
-    }, container);
-
-    return () => ctx.revert();
-  }, []);
+// ─── Testimonials section (async data) ───────────────────────────────────────
+async function TestimonialsSection() {
+  const testimonials = await db.getTestimonials();
+  if (testimonials.length === 0) return null;
 
   return (
-    <div ref={containerRef} className="lg:col-span-6 space-y-8">
-      <h3 className="reveal-item text-lg font-bold text-white tracking-wider uppercase mb-6 flex items-center gap-2">
-        <Award className="w-5 h-5 text-accent-purple" />
-        Career Roadmap
-      </h3>
-      <div className="relative pl-6 space-y-12">
-        {/* Scroll-linked vertical progress line */}
-        <div
-          ref={lineRef}
-          className="timeline-line"
-          aria-hidden="true"
-        />
-
-        {TIMELINE_ITEMS.map((item, idx) => (
-          <div key={idx} className="reveal-item relative">
-            {/* Node dot — activates via JS class toggle */}
-            <div
-              ref={(el) => { nodeRefs.current[idx] = el; }}
-              className="timeline-node"
-              aria-hidden="true"
-            >
-              <div className="node-dot" />
-            </div>
-            <div>
-              <span className="text-[10px] font-mono tracking-wider bg-white/5 border border-white/5 text-accent-purple px-2 py-0.5 rounded-full">
-                {item.year}
-              </span>
-              <h4 className="text-md font-bold text-white mt-2 leading-tight">{item.title}</h4>
-              <span className="text-xs text-zinc-500 font-medium">{item.company}</span>
-              <p className="text-xs text-zinc-400 font-light leading-relaxed mt-2">{item.description}</p>
-            </div>
-          </div>
-        ))}
+    <section className="relative z-10 py-24 bg-foreground/[0.02] border-t border-foreground/8 overflow-hidden">
+      <div className="max-w-6xl mx-auto px-6 mb-12">
+        <SectionReveal>
+          <RevealItem>
+            <span className="text-xs font-semibold tracking-[0.2em] text-amber-500 uppercase">
+              Endorsements
+            </span>
+          </RevealItem>
+          <RevealItem>
+            <h2 className="text-4xl font-heading font-700 text-foreground mt-2 tracking-tight">
+              What clients say
+            </h2>
+          </RevealItem>
+        </SectionReveal>
       </div>
-    </div>
-  );
-}
 
-export default function Home() {
-  const [repos, setRepos] = useState<RepoData[]>([]);
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  // Load dynamic data
-  useEffect(() => {
-    // Mouse movement light beam tracker
-    const handleMouseMove = (e: MouseEvent) => {
-      document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
-      document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-
-    // Fetch GitHub Repos
-    fetch('/api/github')
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) setRepos(data);
-      })
-      .catch((err) => console.error('Error fetching repositories:', err));
-
-    // Fetch Testimonials
-    db.getTestimonials().then((data) => setTestimonials(data));
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, []);
-
-  // Compute Achievements stats
-  const totalStars = repos.reduce((acc, repo) => acc + repo.stars, 0);
-  const totalCommits = repos.reduce((acc, repo) => acc + (repo.commits_count || 0), 0);
-  const projectsBuilt = repos.length > 0 ? repos.length : 12;
-
-  return (
-    <main className="relative min-h-screen bg-[#000000] overflow-x-hidden select-none">
-      {/* Layer 0: Light glow spotlight lamp following cursor */}
-      <div className="pointer-events-none fixed inset-0 z-[0] radial-spotlight" />
-
-      {/* Layer 4b: Floating Header — z-[1000] */}
-      <nav className="fixed top-0 left-0 right-0 z-[1000] p-4 font-sans">
-        <div className="max-w-5xl mx-auto rounded-full glass-panel px-6 py-3 flex items-center justify-between border-[rgba(228,222,216,0.08)] bg-black/50 backdrop-blur-xl">
-          <Link href="#" className="text-sm font-bold tracking-widest text-white flex items-center gap-1.5 uppercase clickable">
-            <Sparkles className="w-4 h-4 text-accent-purple animate-pulse" />
-            Krish Baresha
-          </Link>
-          
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-6">
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="text-xs tracking-wider text-zinc-400 hover:text-white transition-colors uppercase clickable"
-              >
-                {item.name}
-              </Link>
-            ))}
-          </div>
-
-          <Link
-            href="#contact"
-            className="hidden md:inline-flex px-4 py-1.5 rounded-full bg-white text-black text-xs font-semibold hover:bg-zinc-200 transition-colors uppercase clickable"
-          >
-            Hire Me
-          </Link>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden text-zinc-400 hover:text-white transition-colors cursor-pointer"
-            aria-label="Toggle Menu"
-            aria-expanded={mobileMenuOpen}
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-        </div>
-
-        {/* Mobile Dropdown — z-[50] inside the nav (nav itself is z-[1000]) */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="absolute top-18 left-4 right-4 rounded-2xl glass-panel p-6 border-white/5 bg-black/90 backdrop-blur-lg flex flex-col gap-4 md:hidden z-50"
-            >
-              {NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-sm tracking-wider text-zinc-300 hover:text-white transition-colors uppercase py-1"
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <Link
-                href="#contact"
-                onClick={() => setMobileMenuOpen(false)}
-                className="mt-2 w-full py-2.5 rounded-xl bg-white text-black text-center text-xs font-bold hover:bg-zinc-200 transition-colors uppercase"
-              >
-                Hire Me
-              </Link>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </nav>
-
-      {/* SCENE 1 + 2 + 3: Cinematic Scrollytelling (hero) */}
-      <ScrollyCanvas>
-        <Overlay />
-      </ScrollyCanvas>
-
-      {/* SCENE 4 — Projects Work Grid ─────────────────────────────────────── */}
-      <Projects />
-
-      {/* SCENE 5 — About storytelling section ────────────────────────────── */}
-      <section
-        id="about"
-        className="relative z-[100] py-32 px-6 bg-black/20 border-t border-[rgba(228,222,216,0.08)] font-sans"
+      {/* Marquee */}
+      <div
+        className="flex w-[200vw] gap-6 hover:[animation-play-state:paused]"
+        style={{ animation: 'marquee 40s linear infinite' }}
       >
-        <div className="max-w-5xl mx-auto space-y-24">
-          <SectionReveal stagger={0.09} start="top 80%">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-              
-              {/* Journey description */}
-              <div className="lg:col-span-6 space-y-6">
-                <span className="reveal-item text-xs font-bold tracking-[0.2em] text-accent-purple uppercase">
-                  The Story
-                </span>
-                <h2 className="reveal-item text-4xl font-extrabold tracking-tight text-white leading-tight">
-                  DEVELOPER WHO THINKS IN PIXELS AND SYSTEM RUNTIMES.
-                </h2>
-                <p className="reveal-item text-zinc-400 font-light leading-relaxed">
-                  My engineering journey is driven by an obsession with interactive digital craftsmanship. I design UI pipelines that feel physically responsive, while coordinating low-latency backend architectures.
-                </p>
-                <p className="reveal-item text-zinc-400 font-light leading-relaxed">
-                  As AI shifts from raw LLM prompts to self-healing agentic actions, I bridge the gap by deploying vector indices, pgvector retrieval routes, and robust Puppeteer validation runners.
-                </p>
-                
-                {/* Quick counter cards */}
-                <div className="grid grid-cols-3 gap-4 pt-6">
-                  <div className="reveal-item p-4 rounded-xl bg-white/[0.03] border border-[rgba(228,222,216,0.08)] text-center">
-                    <div className="text-2xl font-bold text-[#ffffff] uppercase">{projectsBuilt}</div>
-                    <div className="text-[10px] text-[#95979d] uppercase tracking-wider mt-1">Projects</div>
-                  </div>
-                  <div className="reveal-item p-4 rounded-xl bg-white/[0.03] border border-[rgba(228,222,216,0.08)] text-center">
-                    <div className="text-2xl font-bold text-[#ffffff] uppercase">{totalStars > 0 ? totalStars : '83'}</div>
-                    <div className="text-[10px] text-[#95979d] uppercase tracking-wider mt-1">Stars</div>
-                  </div>
-                  <div className="reveal-item p-4 rounded-xl bg-white/[0.03] border border-[rgba(228,222,216,0.08)] text-center">
-                    <div className="text-2xl font-bold text-[#ffffff] uppercase">{totalCommits > 0 ? totalCommits : '290'}+</div>
-                    <div className="text-[10px] text-[#95979d] uppercase tracking-wider mt-1">Commits</div>
+        <div className="flex gap-6 justify-around w-full">
+          {[...testimonials, ...testimonials].map((t, idx) => (
+            <div
+              key={idx}
+              className="w-[340px] inline-block shrink-0 liquid-glass p-6 rounded-2xl"
+              style={{ whiteSpace: 'normal' }}
+            >
+              <p className="text-sm text-foreground/60 font-light leading-relaxed mb-6">
+                &ldquo;{t.text}&rdquo;
+              </p>
+              <div className="flex items-center gap-3">
+                {t.avatar_url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={t.avatar_url}
+                    alt={t.name}
+                    className="w-9 h-9 rounded-full object-cover border border-foreground/10"
+                  />
+                )}
+                <div>
+                  <div className="text-sm font-semibold text-foreground">{t.name}</div>
+                  <div className="text-[10px] text-foreground/40 tracking-wider uppercase">
+                    {t.role} @ {t.company}
                   </div>
                 </div>
               </div>
-
-              {/* Timeline roadmap — has its own GSAP scroll driver */}
-              <TimelineSection />
             </div>
-          </SectionReveal>
+          ))}
+        </div>
+      </div>
 
-          {/* Interactive Shell / Terminal */}
-          <SectionReveal start="top 85%">
-            <div className="max-w-3xl mx-auto space-y-6 pt-8 border-t border-white/5">
-              <div className="text-center space-y-2">
-                <span className="reveal-item text-xs font-bold tracking-[0.2em] text-accent-purple uppercase">
-                  Interactive Shell
-                </span>
-                <h3 className="reveal-item text-2xl font-extrabold text-white uppercase tracking-wider">
-                  Developer Shell Workspace
-                </h3>
-                <p className="reveal-item text-zinc-500 text-xs font-light max-w-md mx-auto">
-                  Interact directly with my background environment by submitting standard command directives.
-                </p>
+      <style>{`
+        @keyframes marquee {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+      `}</style>
+    </section>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+export default async function Home() {
+  const projects = await getProjects();
+
+  return (
+    <main className="relative min-h-screen bg-background overflow-x-hidden">
+
+      {/* Animated mesh background */}
+      <div className="mesh-background" aria-hidden="true">
+        <div className="mesh-blob mesh-blob-a" />
+        <div className="mesh-blob mesh-blob-b" />
+        <div className="mesh-blob mesh-blob-c" />
+      </div>
+
+      {/* Floating NavBar */}
+      <NavBar />
+
+      {/* ── Hero ── */}
+      <HeroSection />
+
+      {/* ── Projects Bento Grid ── */}
+      <Suspense fallback={<BentoSkeleton />}>
+        <BentoGrid projects={projects} />
+      </Suspense>
+
+      {/* ── About Section ── */}
+      <section
+        id="about"
+        className="relative z-10 py-24 px-6 border-t border-foreground/8"
+      >
+        <div className="max-w-5xl mx-auto">
+          <SectionReveal stagger={0.08}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+
+              {/* Left — story */}
+              <div className="space-y-6">
+                <RevealItem>
+                  <span className="text-xs font-semibold tracking-[0.2em] text-amber-500 uppercase">
+                    The Story
+                  </span>
+                </RevealItem>
+                <RevealItem>
+                  <h2 className="text-4xl md:text-5xl font-heading font-700 text-foreground leading-tight tracking-tight">
+                    Developer who thinks in pixels and system runtimes.
+                  </h2>
+                </RevealItem>
+                <RevealItem>
+                  <p className="text-foreground/60 font-light leading-relaxed">
+                    My engineering journey is driven by an obsession with interactive digital craftsmanship. I design UI pipelines that feel physically responsive, while coordinating low-latency backend architectures.
+                  </p>
+                </RevealItem>
+                <RevealItem>
+                  <p className="text-foreground/60 font-light leading-relaxed">
+                    As AI shifts from raw LLM prompts to self-healing agentic actions, I bridge the gap by deploying vector indices, pgvector retrieval routes, and robust automation runners.
+                  </p>
+                </RevealItem>
+
+                {/* Stats */}
+                <RevealItem>
+                  <div className="grid grid-cols-3 gap-4 pt-2">
+                    {STATS.map((s) => (
+                      <div
+                        key={s.label}
+                        className="liquid-glass p-4 text-center rounded-2xl"
+                      >
+                        <div className="text-2xl font-heading font-700 text-foreground">
+                          {s.value}
+                        </div>
+                        <div className="text-[10px] text-foreground/40 uppercase tracking-wider mt-1">
+                          {s.label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </RevealItem>
               </div>
-              <div className="reveal-item">
-                <InteractiveTerminal />
+
+              {/* Right — timeline */}
+              <div className="space-y-6" id="experience">
+                <RevealItem>
+                  <div className="flex items-center gap-2">
+                    <Award className="w-4 h-4 text-amber-500" />
+                    <span className="text-xs font-semibold tracking-[0.2em] text-amber-500 uppercase">
+                      Career Roadmap
+                    </span>
+                  </div>
+                </RevealItem>
+
+                <div className="space-y-4">
+                  {TIMELINE_ITEMS.map((item, idx) => {
+                    const Icon = item.icon;
+                    return (
+                      <RevealItem key={idx}>
+                        <div className="liquid-glass liquid-glass-hover p-5 rounded-2xl flex gap-4 items-start">
+                          <div className="shrink-0 w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 mt-0.5">
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-[10px] font-mono tracking-wider text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">
+                              {item.year}
+                            </span>
+                            <h4 className="text-sm font-heading font-600 text-foreground mt-2 leading-tight">
+                              {item.title}
+                            </h4>
+                            <span className="text-xs text-foreground/40 font-medium">
+                              {item.company}
+                            </span>
+                            <p className="text-xs text-foreground/50 font-light leading-relaxed mt-1.5">
+                              {item.description}
+                            </p>
+                          </div>
+                        </div>
+                      </RevealItem>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </SectionReveal>
         </div>
       </section>
 
-      {/* SCENE 6 — Skills Showcase section ───────────────────────────────── */}
+      {/* ── Skills Section ── */}
       <section
         id="skills"
-        className="relative z-[100] py-32 px-6 bg-[#000000] border-t border-[rgba(228,222,216,0.08)] font-sans"
+        className="relative z-10 py-24 px-6 border-t border-foreground/8"
       >
         <div className="max-w-6xl mx-auto space-y-16">
-          <SectionReveal start="top 85%">
-            <div className="text-center space-y-4">
-              <span className="reveal-item text-xs font-bold tracking-[0.2em] text-accent-purple uppercase">
-                Capability
-              </span>
-              <h2 className="reveal-item text-4xl md:text-5xl font-extrabold tracking-tight text-white uppercase">
-                FUTURISTIC SKILL SPHERE
-              </h2>
-              <p className="reveal-item text-zinc-500 max-w-lg mx-auto text-sm font-light">
-                Structured capabilities crossing high-performance creative UI systems, neural agents, and database runtimes.
-              </p>
+          <SectionReveal>
+            <div className="text-center space-y-4 max-w-xl mx-auto">
+              <RevealItem>
+                <span className="text-xs font-semibold tracking-[0.2em] text-amber-500 uppercase">
+                  Capabilities
+                </span>
+              </RevealItem>
+              <RevealItem>
+                <h2 className="text-4xl md:text-5xl font-heading font-700 text-foreground tracking-tight">
+                  Technical Skills
+                </h2>
+              </RevealItem>
+              <RevealItem>
+                <p className="text-foreground/50 text-sm font-light leading-relaxed">
+                  Structured capabilities spanning high-performance creative UI systems, neural agents, and database runtimes.
+                </p>
+              </RevealItem>
             </div>
           </SectionReveal>
 
@@ -385,86 +280,44 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials infinite scrolling */}
-      {testimonials.length > 0 && (
-        <section className="relative z-[100] py-32 bg-black/20 border-t border-white/5 overflow-hidden font-sans">
-          <SectionReveal start="top 90%">
-            <div className="max-w-6xl mx-auto px-6 mb-12">
-              <span className="reveal-item text-xs font-bold tracking-[0.2em] text-accent-purple uppercase">
-                Endorsements
-              </span>
-              <h2 className="reveal-item text-4xl font-extrabold tracking-tight text-white mt-2">
-                CLIENT TESTIMONIALS
-              </h2>
-            </div>
-          </SectionReveal>
+      {/* ── Testimonials ── */}
+      <TestimonialsSection />
 
-          {/* Marquee Container — CSS animation, no JS scroll conflict */}
-          <div className="flex w-[200vw] gap-6 animate-[marquee_40s_linear_infinite] hover:[animation-play-state:paused] whitespace-nowrap">
-            <div className="flex gap-6 justify-around w-full">
-              {testimonials.concat(testimonials).map((t, idx) => (
-                <div 
-                  key={idx} 
-                  className="w-[350px] inline-block shrink-0 rounded-2xl glass-panel p-6 whitespace-normal border-white/5"
-                >
-                  <p className="text-sm text-zinc-400 font-light leading-relaxed mb-6">
-                    &ldquo;{t.text}&rdquo;
-                  </p>
-                  <div className="flex items-center gap-4">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img 
-                      src={t.avatar_url} 
-                      alt={t.name} 
-                      className="w-10 h-10 rounded-full object-cover border border-white/10"
-                    />
-                    <div>
-                      <div className="text-sm font-bold text-white">{t.name}</div>
-                      <div className="text-[10px] text-zinc-500 font-semibold tracking-wider uppercase">
-                        {t.role} @ {t.company}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <style jsx global>{`
-            @keyframes marquee {
-              0% { transform: translateX(0); }
-              100% { transform: translateX(-50%); }
-            }
-          `}</style>
-        </section>
-      )}
-
-      {/* SCENE 7 — Contact Section ───────────────────────────────────────── */}
+      {/* ── Contact Section ── */}
       <section
         id="contact"
-        className="relative z-[100] py-32 px-6 bg-[#000000] border-t border-[rgba(228,222,216,0.08)] font-sans"
+        className="relative z-10 py-24 px-6 border-t border-foreground/8"
       >
         <div className="max-w-6xl mx-auto">
-          <SectionReveal start="top 85%">
-            <div className="reveal-item">
+          <SectionReveal>
+            <RevealItem>
               <ContactForm />
-            </div>
+            </RevealItem>
           </SectionReveal>
         </div>
       </section>
 
-      {/* Bottom Footer */}
-      <footer className="relative z-[100] border-t border-[rgba(228,222,216,0.08)] bg-black/80 py-12 px-6 text-[#95979d] font-sans text-xs">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+      {/* ── Footer ── */}
+      <footer className="relative z-10 border-t border-foreground/8 py-10 px-6">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-foreground/40 text-xs">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-white uppercase tracking-wider">Krish Baresha</span>
-            <span>&copy; {new Date().getFullYear()} All Rights Reserved.</span>
+            <GitBranch className="w-3.5 h-3.5" />
+            <span className="font-heading font-600 text-foreground/60">Krish Baresha</span>
+            <span>© {new Date().getFullYear()} — All Rights Reserved.</span>
           </div>
-
+          <div className="flex items-center gap-4">
+            <a href="https://github.com/krishbaresha" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
+              GitHub
+            </a>
+            <a href="https://linkedin.com/in/krishbaresha" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
+              LinkedIn
+            </a>
+            <a href="mailto:krishbareshaworking@gmail.com" className="hover:text-foreground transition-colors">
+              Email
+            </a>
+          </div>
         </div>
       </footer>
-
-      {/* Layer 5b: Floating ChatBot Panel */}
-      <ChatBot />
     </main>
   );
 }

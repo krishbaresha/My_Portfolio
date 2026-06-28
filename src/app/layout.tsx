@@ -1,24 +1,42 @@
 import type { Metadata, Viewport } from "next";
-import { Syne } from "next/font/google";
+import { Archivo, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import CustomCursor from "@/components/CustomCursor";
-import LenisScroll from "@/components/LenisScroll";
+import { Providers } from "./providers";
 
-const syne = Syne({
-  variable: "--font-syne",
+const archivo = Archivo({
+  variable: "--font-archivo",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "Krish Baresha | AI Engineer & Creative Technologist",
-  description: "Portfolio of Krish Baresha. Senior Full Stack Engineer & AI Developer building ultra-premium web experiences, autonomous AI agents, and WebGL visualizations.",
+  description:
+    "Portfolio of Krish Baresha. Senior Full Stack Engineer & AI Developer building ultra-premium web experiences, autonomous AI agents, and high-performance interfaces.",
   metadataBase: new URL("https://krishbaresha.com"),
-  keywords: ["AI Engineer", "Creative Developer", "Next.js", "WebGL", "Three.js", "GSAP", "Agentic AI", "TypeScript", "Linear Design"],
+  keywords: [
+    "AI Engineer",
+    "Creative Developer",
+    "Next.js",
+    "Bento Grid",
+    "Framer Motion",
+    "Agentic AI",
+    "TypeScript",
+    "Liquid Glass",
+  ],
   authors: [{ name: "Krish Baresha", url: "https://github.com/krishbaresha" }],
   openGraph: {
     title: "Krish Baresha | AI Engineer & Creative Technologist",
-    description: "Creative developer portfolio. Custom WebGL shaders, Agentic workflows, and high-fidelity interfaces.",
+    description:
+      "Creative developer portfolio. Agentic workflows and high-fidelity interfaces.",
     url: "https://krishbaresha.com",
     siteName: "Krish Baresha Portfolio",
     images: [
@@ -35,7 +53,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Krish Baresha | AI Engineer & Creative Technologist",
-    description: "Creative developer portfolio. Custom WebGL shaders, Agentic workflows, and high-fidelity interfaces.",
+    description:
+      "Creative developer portfolio. Agentic workflows and high-fidelity interfaces.",
     creator: "@krishbaresha",
     images: ["/og-image.jpg"],
   },
@@ -53,7 +72,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#030303",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0C0A09" },
+    { media: "(prefers-color-scheme: light)", color: "#FAFAF9" },
+  ],
   width: "device-width",
   initialScale: 1,
 };
@@ -66,19 +88,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${syne.variable} antialiased`}
+      suppressHydrationWarning
+      className={`${archivo.variable} ${spaceGrotesk.variable}`}
     >
-      <body className="font-sans bg-background text-foreground antialiased selection:bg-accent-glow selection:text-white">
+      <body className="font-body bg-background text-foreground antialiased selection:bg-accent-gold/20 selection:text-foreground">
         {/* Tactile Noise Texture */}
-        <div className="noise-overlay" />
-        
-        {/* Smooth Lenis Scroll Handler */}
-        <LenisScroll />
+        <div className="noise-overlay" aria-hidden="true" />
 
-        {/* Apple-style Mouse Spotlight cursor */}
-        <CustomCursor />
-        
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

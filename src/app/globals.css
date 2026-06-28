@@ -1,442 +1,458 @@
+/* ─── Google Fonts ──────────────────────────────────────────────────────────── */
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
+
 @import "tailwindcss";
 
+/* ─── Tailwind Theme Tokens ─────────────────────────────────────────────────── */
 @theme {
-  --font-sans: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
-  --color-background: #000000;
-  --color-foreground: #ffffff;
-  --color-card: #000000;
-  --color-card-border: #e5e7eb;
+  /* Fonts */
+  --font-heading: var(--font-archivo), "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-space-grotesk), "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "Fira Code", monospace;
+
+  /* Accent Gold */
+  --color-accent-gold: #CA8A04;
+  --color-accent-gold-light: #EAB308;
   --color-accent-purple: #8b5cf6;
   --color-accent-blue: #3b82f6;
   --color-accent-pink: #ec4899;
-  --color-accent-glow: rgba(139, 92, 246, 0.15);
-  
-  --animate-border-beam: border-beam 4s linear infinite;
-  --animate-float: float 6s ease-in-out infinite;
-  --animate-pulse-slow: pulse-slow 8s ease-in-out infinite;
+
+  /* Keyframes */
+  @keyframes mesh-drift {
+    0%   { transform: translate(0%, 0%) scale(1); }
+    33%  { transform: translate(3%, -4%) scale(1.08); }
+    66%  { transform: translate(-2%, 3%) scale(0.96); }
+    100% { transform: translate(0%, 0%) scale(1); }
+  }
+
+  @keyframes skeleton-shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  @keyframes iridescent-spin {
+    0%   { filter: hue-rotate(0deg) brightness(1.1); }
+    50%  { filter: hue-rotate(180deg) brightness(1.3); }
+    100% { filter: hue-rotate(360deg) brightness(1.1); }
+  }
+
+  @keyframes float-subtle {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-6px); }
+  }
+
+  @keyframes shine-sweep {
+    0%   { left: -100%; opacity: 0; }
+    20%  { opacity: 0.6; }
+    80%  { opacity: 0.6; }
+    100% { left: 120%; opacity: 0; }
+  }
 
   @keyframes border-beam {
-    0%, 100% {
-      offset-distance: 0%;
-    }
-    50% {
-      offset-distance: 100%;
-    }
+    0%, 100% { offset-distance: 0%; }
+    50%       { offset-distance: 100%; }
   }
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0px) rotate(0deg);
-    }
-    50% {
-      transform: translateY(-10px) rotate(1deg);
-    }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translate3d(0, 32px, 0); }
+    to   { opacity: 1; transform: translate3d(0, 0, 0); }
   }
-  @keyframes pulse-slow {
-    0%, 100% {
-      opacity: 0.2;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.4;
-      transform: scale(1.1);
-    }
+
+  @keyframes marquee {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
   }
+
+  /* Animation utilities */
+  --animate-mesh-drift: mesh-drift 18s ease-in-out infinite alternate;
+  --animate-float: float-subtle 6s ease-in-out infinite;
+  --animate-fade-up: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* ─── Stacking Context Architecture ──────────────────────────────────────────
-   Every z-index in the project must map to one of these named layers.
-   Do NOT introduce raw z-index values elsewhere.
-   ─────────────────────────────────────────────────────────────────────────── */
+/* ─── CSS Design System Tokens ──────────────────────────────────────────────── */
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
-  
-  /* Design System Color Tokens */
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #e4ded7;
-  --color-text-tertiary: #95979d;
-  --color-text-inverse: #0e1016;
-  --color-surface-base: #000000;
-  --color-border-default: rgba(228, 222, 216, 0.08);
-  --color-border-strong: rgba(228, 222, 216, 0.15);
-  
-  /* Spacing Scale */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 16px;
-  --space-4: 24px;
-  --space-5: 40px;
-  --space-6: 64px;
-  --space-7: 80px;
-  --space-8: 96px;
+  /* ── Light Mode (default — overridden by .dark class) ─────────────────── */
+  --background:        #FAFAF9;
+  --foreground:        #0C0A09;
+  --surface:           rgba(255, 255, 255, 0.80);
+  --surface-hover:     rgba(255, 255, 255, 0.92);
+  --border:            rgba(0, 0, 0, 0.08);
+  --border-strong:     rgba(0, 0, 0, 0.14);
+  --muted:             #78716C;
+  --muted-bg:          rgba(0, 0, 0, 0.04);
 
-  /* ── Stacking Layer Tokens ────────────────────────────────────────────── */
-  --z-bg-fx:          0;      /* Layer 0: radial-spotlight, gradients */
-  --z-canvas:         1;      /* Layer 1: scroll animation canvas / 3D */
-  --z-exit-fade:      2;      /* Layer 2: exit-fade black overlay */
-  --z-vignette:       3;      /* Layer 3: vignette gradient overlays */
-  --z-section-bg:    20;      /* Layer 2b: section backgrounds */
-  --z-content:      100;      /* Layer 3: UI content (post-hero sections) */
-  --z-dropdown:      50;      /* Layer 4a: mobile dropdown */
-  --z-nav:         1000;      /* Layer 4b: floating navigation */
-  --z-loading:      999;      /* Layer 4c: loading screen */
-  --z-noise:       9999;      /* Layer 5a: noise texture */
-  --z-cursor:     10000;      /* Layer 5b: custom cursor (above all) */
+  --glass-bg:          rgba(255, 255, 255, 0.72);
+  --glass-blur:        blur(24px) saturate(180%);
+  --glass-border:      rgba(255, 255, 255, 0.6);
+  --glass-shadow:      0 8px 32px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(255,255,255,0.8) inset;
 
-  /* ── Nav offset so anchor-linked sections don't hide under nav ─────── */
-  --nav-height: 72px;
+  --mesh-color-a:      rgba(202, 138, 4, 0.06);
+  --mesh-color-b:      rgba(139, 92, 246, 0.05);
+  --mesh-color-c:      rgba(59, 130, 246, 0.04);
 
-  /* ── Cinema easing token ──────────────────────────────────────────── */
+  /* Spacing & Radius */
+  --nav-height:        72px;
+  --radius-card:       18px;
+  --radius-card-hover: 26px;
+
+  /* z-index system */
+  --z-bg-fx:    0;
+  --z-content:  10;
+  --z-overlay:  50;
+  --z-nav:      1000;
+  --z-noise:    9999;
+
+  /* Easing */
   --ease-cinema: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Morph transition */
+  --morph-duration: 500ms;
 }
 
-/* Base Styles */
+/* ── Dark Mode ──────────────────────────────────────────────────────────────── */
+.dark {
+  --background:        #0C0A09;
+  --foreground:        #FAFAF9;
+  --surface:           rgba(255, 255, 255, 0.04);
+  --surface-hover:     rgba(255, 255, 255, 0.08);
+  --border:            rgba(255, 255, 255, 0.08);
+  --border-strong:     rgba(255, 255, 255, 0.15);
+  --muted:             #78716C;
+  --muted-bg:          rgba(255, 255, 255, 0.04);
+
+  --glass-bg:          rgba(12, 10, 9, 0.60);
+  --glass-blur:        blur(24px) saturate(180%);
+  --glass-border:      rgba(255, 255, 255, 0.10);
+  --glass-shadow:      0 8px 40px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255,255,255,0.06) inset;
+
+  --mesh-color-a:      rgba(202, 138, 4, 0.08);
+  --mesh-color-b:      rgba(139, 92, 246, 0.10);
+  --mesh-color-c:      rgba(59, 130, 246, 0.06);
+}
+
+/* ─── Base Styles ────────────────────────────────────────────────────────────── */
 html, body {
-  background-color: #000000;
-  color: #ffffff;
-  /* scroll-behavior managed entirely by Lenis — do NOT set smooth/auto here */
+  background-color: var(--background);
+  color: var(--foreground);
   overflow-x: hidden;
   margin: 0;
   padding: 0;
+  font-family: var(--font-body);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   font-size: 16px;
-  line-height: 24px;
+  line-height: 1.6;
   font-weight: 400;
+  transition: background-color 300ms var(--ease-cinema), color 200ms var(--ease-cinema);
 }
 
-/* ── Anchor scroll offset — prevents nav overlap on jump links ──────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
 [id] {
   scroll-margin-top: var(--nav-height);
 }
 
-/* Custom Cursor Resets */
-@media (pointer: fine) {
-  .custom-cursor-active, 
-  .custom-cursor-active a, 
-  .custom-cursor-active button, 
-  .custom-cursor-active input, 
-  .custom-cursor-active textarea,
-  .custom-cursor-active [role="button"] {
-    cursor: none !important;
-  }
-}
+/* ─── Scrollbar ──────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar              { width: 6px; }
+::-webkit-scrollbar-track        { background: var(--background); }
+::-webkit-scrollbar-thumb        { background: var(--border-strong); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover  { background: var(--muted); }
 
-/* Custom Premium Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #000000;
-}
-::-webkit-scrollbar-thumb {
-  background: #1a1a1a;
-  border-radius: 9999px;
-  border: 2px solid #000000;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #2a2a2a;
-}
-
-/* Glassmorphism panel helper - aligned to design system border tokens */
-.glass-panel {
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--color-border-default);
-}
-
-.glass-panel-hover {
-  transition: all 200ms var(--ease-cinema);
-}
-.glass-panel-hover:hover {
-  background: rgba(10, 10, 10, 0.9);
-  border-color: var(--color-border-strong);
-  box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.7);
-  transform: translateY(-2px);
-}
-
-/* Tactile Noise Overlay */
-.noise-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  content: "";
-  opacity: 0.02;
-  pointer-events: none;
-  z-index: var(--z-noise);
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-}
-
-/* Radial spotlight glowing backdrop */
-.radial-spotlight {
-  background: radial-gradient(
-    600px circle at var(--mouse-x, 0px) var(--mouse-y, 0px),
-    rgba(99, 102, 241, 0.06),
-    transparent 40%
-  );
-}
-
-/* Hide scrollbar utility */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* GPU-accelerated scroll canvas pin ─────────────────────────────────────── */
-/* GSAP injects .gsap-marker-scroller-start etc. — ensure no layout bleed  */
-.pin-spacer {
-  pointer-events: none !important;
-}
-
-/* Smooth entry for sections that follow the hero scroll sequence ──────────── */
-#projects {
-  position: relative;
-  z-index: var(--z-content);
-  background-color: #000000;
-}
-
-/* ── Section Reveal Animations ───────────────────────────────────────────────
-   GPU-safe: only translate3d + opacity. No height/margin/padding changes.
-   These are the initial hidden states set by SectionReveal.tsx via GSAP.
-   ─────────────────────────────────────────────────────────────────────────── */
-.reveal-item {
-  opacity: 0;
-  transform: translate3d(0, 40px, 0);
-  will-change: transform, opacity;
-}
-
-/* ── Timeline vertical draw line ─────────────────────────────────────────── */
-.timeline-line {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 1px;
-  height: 100%;
-  background: rgba(228, 222, 216, 0.1);
-  overflow: hidden;
-}
-
-.timeline-line::after {
-  content: '';
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: var(--timeline-progress, 0%);
-  background: linear-gradient(
-    to bottom,
-    var(--color-accent-purple),
-    var(--color-accent-blue)
-  );
-  transition: height 0.4s var(--ease-cinema);
-  will-change: height;
-}
-
-/* ── Timeline node activation ────────────────────────────────────────────── */
-.timeline-node {
-  position: absolute;
-  left: -31px;
-  top: 6px;
-  width: 16px;
-  height: 16px;
-  border-radius: 9999px;
-  background: #000;
-  border: 2px solid rgba(228, 222, 216, 0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: border-color 0.3s var(--ease-cinema), box-shadow 0.3s var(--ease-cinema);
-  will-change: border-color, box-shadow;
-}
-
-.timeline-node.active {
-  border-color: var(--color-accent-purple);
-  box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
-}
-
-.timeline-node .node-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.3);
-  transition: background 0.3s var(--ease-cinema);
-}
-
-.timeline-node.active .node-dot {
-  background: #ffffff;
-}
-
-/* ── Contact form: GPU-safe focus ring (no layout shift) ─────────────────── */
-.form-field {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 12px 16px;
-  color: #ffffff;
-  font-size: 0.875rem;
-  outline: none;
-  /* Use box-shadow instead of border/bg changes to avoid layout recalc */
-  box-shadow: 0 0 0 0px rgba(139, 92, 246, 0);
-  transition:
-    box-shadow 200ms var(--ease-cinema),
-    border-color 200ms var(--ease-cinema);
-  will-change: box-shadow;
-  transform: translateZ(0); /* own compositor layer — prevents focus reflow */
-}
-
-.form-field::placeholder {
-  color: rgba(255, 255, 255, 0.2);
-}
-
-.form-field:focus {
-  border-color: rgba(139, 92, 246, 0.5);
-  box-shadow:
-    0 0 0 3px rgba(139, 92, 246, 0.15),
-    inset 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-.form-field:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* ── Animated gradient border on contact form card ───────────────────────── */
-@keyframes gradient-border-spin {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.contact-card {
-  position: relative;
-  border-radius: 16px;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
-
-.contact-card::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: 17px;
-  background: linear-gradient(
-    135deg,
-    rgba(139, 92, 246, 0.4),
-    rgba(59, 130, 246, 0.2),
-    rgba(236, 72, 153, 0.2),
-    rgba(139, 92, 246, 0.4)
-  );
-  background-size: 300% 300%;
-  animation: gradient-border-spin 8s ease infinite;
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Selection Highlight */
+/* ─── Selection ──────────────────────────────────────────────────────────────── */
 ::selection {
-  background: rgba(139, 92, 246, 0.3);
-  color: #ffffff;
+  background: rgba(202, 138, 4, 0.25);
+  color: var(--foreground);
 }
 
-/* Focus-visible ring for keyboard navigation (WCAG 2.2 AA) */
+/* ─── Focus ──────────────────────────────────────────────────────────────────── */
 :focus-visible {
-  outline: 2px solid rgba(139, 92, 246, 0.8);
+  outline: 2px solid rgba(202, 138, 4, 0.7);
   outline-offset: 3px;
   border-radius: 4px;
 }
 
-/* Markdown styling overrides for blog articles */
-.prose {
-  color: #a1a1aa;
+/* ─── Noise Texture Overlay ─────────────────────────────────────────────────── */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: var(--z-noise);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+
+/* ─── Animated Mesh Background ──────────────────────────────────────────────── */
+.mesh-background {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-bg-fx);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.mesh-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  will-change: transform;
+  animation: var(--animate-mesh-drift);
+}
+
+.mesh-blob-a {
+  width: 600px;
+  height: 600px;
+  top: -10%;
+  right: -5%;
+  background: var(--mesh-color-b);
+  animation-delay: 0s;
+  animation-duration: 20s;
+}
+
+.mesh-blob-b {
+  width: 500px;
+  height: 500px;
+  bottom: 10%;
+  left: -10%;
+  background: var(--mesh-color-a);
+  animation-delay: -7s;
+  animation-duration: 24s;
+}
+
+.mesh-blob-c {
+  width: 400px;
+  height: 400px;
+  top: 40%;
+  left: 40%;
+  background: var(--mesh-color-c);
+  animation-delay: -14s;
+  animation-duration: 18s;
+}
+
+/* ─── Liquid Glass Panel ─────────────────────────────────────────────────────── */
+/*
+  The core design primitive for all cards, navbars, and panels.
+  Uses backdrop-filter for the frosted glass effect, box-shadow for depth,
+  and a ::before pseudo for the specular highlight sweep on hover.
+*/
+.liquid-glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius-card);
+  position: relative;
+  overflow: hidden;
+  transition:
+    border-radius var(--morph-duration) var(--ease-cinema),
+    box-shadow var(--morph-duration) var(--ease-cinema),
+    border-color 300ms var(--ease-cinema),
+    background 300ms var(--ease-cinema);
+  will-change: transform, border-radius;
+}
+
+/* Specular highlight sweep — diagonal shine on hover */
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.12) 50%,
+    transparent 80%
+  );
+  transition: left 0s;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.liquid-glass:hover::before {
+  animation: shine-sweep 0.7s var(--ease-cinema) forwards;
+}
+
+/* Hover state — morph + iridescent glow */
+.liquid-glass-hover:hover {
+  border-radius: var(--radius-card-hover);
+  border-color: rgba(202, 138, 4, 0.25);
+  box-shadow:
+    var(--glass-shadow),
+    0 0 0 1px rgba(202, 138, 4, 0.1),
+    0 0 32px rgba(139, 92, 246, 0.12),
+    0 0 64px rgba(59, 130, 246, 0.06);
+}
+
+/* Iridescent edge glow (stronger, used on project bento cards) */
+.iridescent-glow:hover {
+  border-color: transparent;
+  box-shadow:
+    0 0 0 1px rgba(139, 92, 246, 0.4),
+    0 0 24px rgba(139, 92, 246, 0.2),
+    0 0 48px rgba(59, 130, 246, 0.1),
+    0 0 80px rgba(236, 72, 153, 0.06),
+    var(--glass-shadow);
+}
+
+/* ─── Bento Grid Layout ──────────────────────────────────────────────────────── */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: minmax(120px, auto);
+  gap: 16px;
+}
+
+/* Card size variants */
+.bento-sm   { grid-column: span 4; }
+.bento-md   { grid-column: span 6; }
+.bento-lg   { grid-column: span 8; }
+.bento-xl   { grid-column: span 12; }
+.bento-full { grid-column: span 12; }
+
+/* Responsive stacking */
+@media (max-width: 1024px) {
+  .bento-sm, .bento-md, .bento-lg { grid-column: span 6; }
+}
+@media (max-width: 768px) {
+  .bento-grid { grid-template-columns: 1fr; gap: 12px; }
+  .bento-sm, .bento-md, .bento-lg, .bento-xl, .bento-full { grid-column: span 1; }
+}
+
+/* ─── Skeleton Loading ───────────────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--muted-bg) 0%,
+    var(--surface-hover) 50%,
+    var(--muted-bg) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+  border-radius: var(--radius-card);
+}
+
+/* ─── Chromatic Aberration Text ──────────────────────────────────────────────── */
+/*
+  Creates a subtle red/blue channel split illusion on heading text,
+  simulating light refraction through liquid glass. GPU-safe (filter only).
+*/
+.text-chroma {
+  position: relative;
+}
+
+.text-chroma::before,
+.text-chroma::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.text-chroma::before {
+  color: rgba(236, 72, 153, 0.35);
+  transform: translate(-2px, 0);
+  filter: blur(0.5px);
+}
+
+.text-chroma::after {
+  color: rgba(59, 130, 246, 0.35);
+  transform: translate(2px, 0);
+  filter: blur(0.5px);
+}
+
+/* ─── Section Reveal Animations ──────────────────────────────────────────────── */
+/* Initial hidden state — Framer Motion targets these via JS */
+.reveal-item {
+  opacity: 0;
+  transform: translate3d(0, 32px, 0);
+  will-change: transform, opacity;
+}
+
+/* ─── Form Styles ────────────────────────────────────────────────────────────── */
+.form-field {
+  width: 100%;
+  background: var(--muted-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: var(--foreground);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  outline: none;
+  box-shadow: 0 0 0 0px rgba(202, 138, 4, 0);
+  transition:
+    box-shadow 200ms var(--ease-cinema),
+    border-color 200ms var(--ease-cinema);
+  will-change: box-shadow;
+  transform: translateZ(0);
+}
+
+.form-field::placeholder { color: var(--muted); opacity: 0.7; }
+
+.form-field:focus {
+  border-color: rgba(202, 138, 4, 0.5);
+  box-shadow: 0 0 0 3px rgba(202, 138, 4, 0.12), inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.form-field:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── Prose (Blog) ───────────────────────────────────────────────────────────── */
+.prose { color: var(--muted); }
 .prose h1, .prose h2, .prose h3, .prose h4 {
-  color: #f4f4f5;
+  color: var(--foreground);
+  font-family: var(--font-heading);
   font-weight: 700;
   margin-top: 1.5em;
   margin-bottom: 0.5em;
 }
 .prose h1 { font-size: 2rem; }
-.prose h2 { font-size: 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 0.3em; }
-.prose p {
-  line-height: 1.75;
-  margin-bottom: 1.25em;
-}
+.prose h2 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+.prose p  { line-height: 1.75; margin-bottom: 1.25em; }
 .prose code {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--muted-bg);
   padding: 0.2em 0.4em;
   border-radius: 4px;
   font-size: 0.9em;
-  color: #ec4899;
+  color: #CA8A04;
 }
 .prose pre {
-  background: #09090b;
+  background: var(--surface);
   padding: 1.25em;
   border-radius: 8px;
   overflow-x: auto;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
   margin-bottom: 1.5em;
 }
-.prose pre code {
-  background: transparent;
-  padding: 0;
-  color: #f4f4f5;
-  font-size: 0.875em;
-}
+.prose pre code { background: transparent; padding: 0; color: var(--foreground); font-size: 0.875em; }
 
-/* ── Reduced Motion Guard ─────────────────────────────────────────────────────
-   Disable ALL parallax, 3D transforms, and decorative animations
-   for users who prefer reduced motion (WCAG 2.2 §2.3.3 criterion).
-   GSAP animations in JS must also check this via window.matchMedia.
-   ─────────────────────────────────────────────────────────────────────────── */
+/* ─── Utility Helpers ────────────────────────────────────────────────────────── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ─── Reduced Motion ─────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 
-  /* Keep functional transitions (focus rings, etc.) */
-  .form-field {
-    transition: none;
-  }
-
-  /* Reveal items jump directly to final state */
-  .reveal-item {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-
-  /* Disable gradient border spin */
-  .contact-card::before {
-    animation: none;
-  }
-
-  /* Disable timeline line animation */
-  .timeline-line::after {
-    transition: none;
-    height: 100%;
-  }
+  .reveal-item { opacity: 1 !important; transform: none !important; }
+  .mesh-blob   { animation: none !important; }
+  .liquid-glass::before { display: none; }
 }
 
-/* ── Mobile: reduce animation depth ─────────────────────────────────────── */
+/* ─── Mobile Adjustments ─────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .reveal-item {
-    /* Shorter travel distance on mobile */
-    transform: translate3d(0, 20px, 0);
-  }
+  .reveal-item { transform: translate3d(0, 18px, 0); }
+  .text-chroma::before { transform: translate(-1px, 0); }
+  .text-chroma::after  { transform: translate(1px, 0); }
 }
