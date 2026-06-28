@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     siteName: "Krish Baresha Portfolio",
     images: [
       {
-        url: "https://krishbaresha.tech/og-image.png",
+        url: "https://krishbaresha.tech/og-image.webp",
         width: 1200,
         height: 630,
         alt: "Krish Baresha Creative Portfolio",
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     description:
       "Creative developer portfolio. Agentic workflows and high-fidelity interfaces.",
     creator: "@krishbaresha",
-    images: ["/og-image.png"],
+    images: ["/og-image.webp"],
   },
   robots: {
     index: true,
