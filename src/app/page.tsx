@@ -7,7 +7,6 @@
  */
 
 import { Suspense } from 'react';
-import dynamic from 'next/dynamic';
 import NavBar from '@/components/NavBar';
 import HeroSection from '@/components/HeroSection';
 import BentoGrid from '@/components/BentoGrid';
@@ -17,13 +16,10 @@ import TestimonialsSkeleton from '@/components/TestimonialsSkeleton';
 import InteractiveSkills from '@/components/InteractiveSkills';
 import ContactForm from '@/components/ContactForm';
 import SectionReveal, { RevealItem } from '@/components/SectionReveal';
+import ScrollSequenceWrapper from '@/components/ScrollSequenceWrapper';
 import { getProjects } from '@/lib/projects';
-import { Award, Sparkles, GitBranch, Code2, Brain } from 'lucide-react';
+import { Award, Sparkles, GitBranch, Code2, Brain } from 'lucide-react';  
 
-const ScrollSequence = dynamic(() => import('@/components/ScrollSequence'), {
-  ssr: false,
-  loading: () => null,
-});
 
 // ─── Timeline data ────────────────────────────────────────────────────────────
 const TIMELINE_ITEMS = [
@@ -90,7 +86,7 @@ export default async function Home() {
       <HeroSection />
 
       {/* ── Scroll sequence (hidden if frames missing) ── */}
-      <ScrollSequence />
+      <ScrollSequenceWrapper />
 
       {/* ── Projects Bento Grid ── */}
       <Suspense fallback={<BentoSkeleton />}>
