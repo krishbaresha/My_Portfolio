@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Send, CheckCircle2, MessageSquare, Link2, Mail } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { db } from '@/lib/supabase';
+import { submitContactAction } from '@/lib/actions/contacts';
 
 export default function ContactForm() {
   const [form, setForm] = useState({
@@ -22,8 +22,8 @@ export default function ContactForm() {
 
     setStatus('submitting');
     try {
-      const { error } = await db.submitContact(form);
-      if (error) throw error;
+      const { error } = await submitContactAction(form);
+      if (error) throw new Error(error);
 
       setStatus('success');
       confetti({

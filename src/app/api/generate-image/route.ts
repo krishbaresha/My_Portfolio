@@ -1,11 +1,27 @@
 import { NextResponse } from 'next/server';
+import { rateLimitResponse } from '@/lib/rate-limit';
+import { checkAdminSession } from '@/lib/actions/auth';
+
+const RATE_LIMIT = { capacity: 5, refillPerSecond: 5 / 60 }; // 5/min per IP
+const MAX_PROMPT_CHARS = 1000;
 
 export async function POST(req: Request) {
+  // Image generation is an admin-only tool (used from the project form).
+  if (!(await checkAdminSession())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const limited = rateLimitResponse(req, 'gen-image', RATE_LIMIT);
+  if (limited) return limited;
+
   try {
     const { prompt } = await req.json();
 
-    if (!prompt) {
+    if (!prompt || typeof prompt !== 'string') {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
+    }
+    if (prompt.length > MAX_PROMPT_CHARS) {
+      return NextResponse.json({ error: 'Prompt too long.' }, { status: 400 });
     }
 
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;

@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server';
+import { rateLimitResponse } from '@/lib/rate-limit';
 
 const AI_PROVIDER = process.env.AI_PROVIDER || 'GEMINI';
+
+// 10 messages / 2 min per IP is plenty for a portfolio chatbot.
+const RATE_LIMIT = { capacity: 10, refillPerSecond: 10 / 120 };
+// Guard against pathologically large conversation histories.
+const MAX_MESSAGES = 30;
+const MAX_CONTENT_CHARS = 8000;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 const GROK_API_KEY = process.env.GROK_API_KEY || '';
 
@@ -26,10 +33,23 @@ Be concise, premium, and confident in your tone. Reflect a Stripe/Linear design 
 `;
 
 export async function POST(req: Request) {
+  const limited = rateLimitResponse(req, 'chat', RATE_LIMIT);
+  if (limited) return limited;
+
   try {
     const { messages } = await req.json();
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: 'Invalid messages format' }, { status: 400 });
+    }
+
+    if (messages.length > MAX_MESSAGES) {
+      return NextResponse.json({ error: 'Conversation too long.' }, { status: 400 });
+    }
+    // Clamp oversized individual messages to bound prompt cost.
+    for (const m of messages) {
+      if (typeof m?.content === 'string' && m.content.length > MAX_CONTENT_CHARS) {
+        return NextResponse.json({ error: 'Message too long.' }, { status: 400 });
+      }
     }
 
 
@@ -121,9 +141,9 @@ export async function POST(req: Request) {
     }
 
   } catch (error) {
-    const err = error as Error;
-    console.error('Error in AI Assistant API route:', err);
-    return NextResponse.json({ error: err.message || 'Failed to process AI chat request' }, { status: 500 });
+    console.error('Error in AI Assistant API route:', error);
+    // Don't leak internal error text to the client.
+    return NextResponse.json({ error: 'Failed to process AI chat request' }, { status: 500 });
   }
 }
 export const dynamic = 'force-dynamic';

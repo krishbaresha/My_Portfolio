@@ -24,20 +24,11 @@ import { db } from '@/lib/supabase';
 import { verifyAdminPasscode, checkAdminSession } from '@/lib/actions/auth';
 import { upsertProjectAction, deleteProjectAction } from '@/lib/actions/projects';
 import { addTestimonialAction, deleteTestimonialAction } from '@/lib/actions/testimonials';
+import { listContactsAction } from '@/lib/actions/contacts';
+import type { Contact } from '@/lib/actions/contacts';
 import { ImageUpload } from '@/components/admin/ImageUpload';
 import { GithubIcon } from '@/components/Icons';
 import type { Project, ProjectUpsert, Testimonial } from '@/lib/supabase';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-interface Contact {
-  id: string;
-  name: string;
-  email: string;
-  company: string;
-  budget: string;
-  message: string;
-  created_at: string;
-}
 
 interface NewTestimonial {
   name: string;
@@ -348,13 +339,16 @@ export default function AdminPage() {
   const loadData = async () => {
     setLoadingData(true);
     try {
-      const [tData, cData, pData] = await Promise.all([
+      const [tData, contactsResult, pData] = await Promise.all([
         db.getTestimonials(),
-        db.getContacts(),
+        listContactsAction(),
         db.getProjects(),
       ]);
       setTestimonials(tData);
-      setContacts(cData);
+      if (contactsResult.error) {
+        setActionError(contactsResult.error);
+      }
+      setContacts(contactsResult.data);
       setProjects(pData);
     } catch (err) {
       console.error('Error loading admin data:', err);
